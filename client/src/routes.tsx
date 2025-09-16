@@ -1,11 +1,21 @@
 import { Route, Routes } from "react-router";
-import { Home,NotFound } from "./app/pages";
+import { Home, NotFound } from "./app/pages";
+import React from "react";
 
-export default function MainRoutes() {
-  return (
-    <Routes>
-      <Route path="/" element={<Home/>} />
-      <Route path="*" element={<NotFound/>} />
-    </Routes>
-  );
+interface RoutesProps {
+  children?: React.ReactNode;
 }
+
+const MainRoutes: React.FC<RoutesProps> = ({ children }) => {
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      {children}
+    </>
+  );
+};
+
+export default MainRoutes;
