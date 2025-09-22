@@ -1,11 +1,13 @@
-import { Greetings } from "@/app/components";
+// import { Greetings } from "@/app/components";
+import Chat from "../components/Chat";
 
 export default function Home() {
   return (
     <>
-      <title>Домашняя страница</title>
-      {/* если будет авторизация тогда тут будет юзер контекст и выбор компонента */}
-      <Greetings/>
+      <title>Mega-Bot | Домашняя страница</title>
+
+      <Chat />
+      {/* <Greetings/> */}
     </>
   );
 }

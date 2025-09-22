@@ -1,3 +1,5 @@
-import Greetings from "./Greetings";
+import Button from "./Button";
+import Heading from "./Heading";
+import HomeIconLink from "./HomeIconLink";
 
-export {Greetings}
+export {Button,Heading,HomeIconLink}
