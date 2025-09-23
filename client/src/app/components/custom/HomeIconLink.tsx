@@ -17,7 +17,7 @@ const HomeIconLink: React.FC<Props> = ({
 }) => {
   return (
     <div
-      className={`transition-all duration-150 hover:-translate-y-1 text-[var(--text-primary)] hover:text-[var(--btn-primary)] ${divClass}`}
+      className={`transition-all delay-100 duration-150 hover:-translate-y-1 text-[var(--text-primary)] hover:text-[var(--icon-hover-primary)] ${divClass}`}
     >
       <Link to="/">
         <MainIcon className={iconClass} w={w} h={h} />

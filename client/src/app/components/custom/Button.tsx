@@ -7,7 +7,7 @@ type Props = {
 
 const Button: React.FC<Props> = ({ className, children }) => {
   return (
-    <button className={`${className} hover:drop-shadow(2xl_var(--text-primary)) transition-all duration-150 hover:-translate-y-1 font-mako font-medium`}>
+    <button className={`${className} transition-all delay-100 duration-150  hover:-translate-y-1 font-mako font-medium`}>
       {children}
     </button>
   );

@@ -15,6 +15,8 @@ export const ThemeContext = createContext<ContextValue>({
   setTheme: () => {},
 });
 
+const allowedThemes: string[] = ["system", "dark", "light"];
+
 export const ThemeProvider: React.FC<ProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem("theme") as Theme) || "system"
@@ -27,6 +29,9 @@ export const ThemeProvider: React.FC<ProviderProps> = ({ children }) => {
       body.classList.remove("light", "dark");
       body.classList.add(theme);
     };
+    if (!allowedThemes.includes(theme)) {
+      setTheme("system");
+    }
     if (theme === "system") {
       const mql = window.matchMedia("(prefers-color-scheme: dark)");
       const systemDark = mql.matches ? "dark" : "light";
