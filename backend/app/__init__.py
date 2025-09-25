@@ -1,3 +1,2 @@
-from .main import create_application
-
-__all__ = ["create_application"]
+__version__ = "1.0.0"
+__author__ = "DaNaY"
