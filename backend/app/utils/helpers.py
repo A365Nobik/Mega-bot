@@ -1,5 +1,3 @@
-import datetime
-import hashlib
 import json
 from typing import Any
 import uuid
@@ -7,14 +5,6 @@ import uuid
 
 def generate_session_id() -> str:
     return str(uuid.uuid4())
-
-
-def hash_message(message: str) -> str:
-    return hashlib.md5(message.encode("utf-8")).hexdigest()
-
-
-def format_timestamp(dt: datetime) -> str:
-    return dt.strftime("%Y-%m-%d %H:%M:%S")
 
 
 def safe_json_loads(json_str: str, default: Any = None) -> Any:
