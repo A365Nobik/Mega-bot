@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     YANDEX_API_URL: str = (
         "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
     )
-    YANDEX_FOLDER_ID: str = None
+    YANDEX_FOLDER_ID: Optional[str] = None
 
     MAX_ITERATIONS: int = 10
     SESSION_TIMEOUT: int = 3600

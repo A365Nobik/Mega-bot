@@ -2,9 +2,9 @@ from datetime import datetime
 import json
 from typing import AsyncGenerator, Dict, Optional
 from uuid import uuid4
-from app.services.ai_models import DeepSeekModel, YandexGPTModel, GigaChatModel
-from app.services import SessionService
-from app.models.chat import (
+from .ai_models import DeepSeekModel, YandexGPTModel, GigaChatModel
+from .session_service import SessionService
+from ..models.chat import (
     ChatResponse,
     ConversationEntry,
     ModelResponse,
@@ -12,7 +12,7 @@ from app.models.chat import (
     StreamEvent,
     StreamEventType,
 )
-from app.core.config import settings
+from ..core.config import settings
 
 
 class ChatService:

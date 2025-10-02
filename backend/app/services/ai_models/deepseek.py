@@ -1,6 +1,6 @@
 import random
-from app.core.config import settings
-from app.models.chat import ResponseType
+from ...core.config import settings
+from ...models.chat import ResponseType
 from .base import BaseAIModel
 import json
 

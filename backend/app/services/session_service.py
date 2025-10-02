@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import List, Dict, Optional
 from uuid import uuid4
 
-from app.models.chat import ConversationEntry
-from app.models.session import Session, SessionResponse
-from app.core.config import settings
+from ..models.chat import ConversationEntry
+from ..models.session import Session, SessionResponse
+from ..core.config import settings
 
 
 class SessionService:

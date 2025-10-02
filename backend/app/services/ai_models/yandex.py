@@ -1,7 +1,7 @@
 import random
-from app.models.chat import ResponseType
+from ...models.chat import ResponseType
 from .base import BaseAIModel
-from app.core.config import settings
+from ...core.config import settings
 import json
 
 
@@ -41,16 +41,16 @@ class YandexGPTModel(BaseAIModel):
             {
                 "response_type": ResponseType.REQUEST_TO_MODEL,
                 "body": "Направляю новые данные к GigaChat для финализации ответа",
-                "taget_model": "GigaChat",
+                "target_model": "GigaChat",
             },
         ]
-        return json.dumps(random.choise(responses), ensure_ascii=False)
+        return json.dumps(random.choice(responses), ensure_ascii=False)
 
     def _get_specialization(self) -> str:
         return "Общие вопросы, анализ текста, перевод, математика, анализ данных"
 
     def _get_headers(self) -> dict:
-        """Переопределяем метод для спецефичных заголовков YandexGPT"""
+        """Переопределяем метод для специфичных заголовков YandexGPT"""
 
         return {
             "Content-Type": "application/json",
