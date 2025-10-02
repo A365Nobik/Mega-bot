@@ -4,17 +4,16 @@ interface IProps {
   weight?: string;
   className?: string;
 }
-const Paragraph = ({
+const Heading = ({
   children,
-  size = "text-lg",
+  size = "text-3xl",
   weight = "font-medium",
   className,
 }: IProps) => {
   return (
-    <p className={`text-[var(--text-primary)] ${size} ${weight} ${className}`}>
+    <h1 className={`text-[var(--text-primary)] ${size} ${weight} ${className}`}>
       {children}
-    </p>
+    </h1>
   );
 };
-
-export default Paragraph;
+export default Heading;

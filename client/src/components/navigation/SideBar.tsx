@@ -6,7 +6,7 @@ import MainIcon from "@/assets/svg/MainIcon";
 import Link from "next/link";
 import Image from "next/image";
 
-const SideBar: React.FC = () => {
+const SideBar= () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChatsOpen, setChatsOpen] = useState(true);
   const chatBlockRef = useRef<HTMLDivElement | null>(null);

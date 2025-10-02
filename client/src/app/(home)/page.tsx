@@ -1,5 +1,6 @@
 import { SideBar, Header } from "@/components";
-// import Chat from "../components/Chat";
+import Chat from "@/components/Chat";
+import { Paragraph } from "@/components";
 
 export default function Home() {
   return (
@@ -9,9 +10,9 @@ export default function Home() {
         <SideBar />
         <div className="flex-1 flex-col justify-center">
           <Header />
-          {/* <div className="flex-1">
+          <div className="flex-1">
             <Chat />
-          </div> */}
+          </div>
         </div>
       </div>
     </>

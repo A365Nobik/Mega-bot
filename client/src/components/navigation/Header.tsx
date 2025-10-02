@@ -2,7 +2,7 @@ import React from "react";
 import { Button, HomeIconLink,Paragraph } from "@/components/custom";
 import Link from "next/link";
 
-const Header: React.FC = () => {
+const Header = () => {
   const primaryBtnClass: string = "rounded-xl text-xl";
   return (
     <header className="w-full flex gap-2 px-2 py-4 animate-appear ">
