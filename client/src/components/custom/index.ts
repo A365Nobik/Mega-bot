@@ -4,4 +4,13 @@ import Paragraph from "./Paragraph";
 import MainIconBlock from "./MainIconBlock";
 import ImageBlock from "./ImageBlock";
 import Heading from "./Heading";
-export { Button, HomeIconLink, Paragraph, MainIconBlock, ImageBlock, Heading };
+import TextArea from "./TextArea";
+export {
+  Button,
+  HomeIconLink,
+  Paragraph,
+  MainIconBlock,
+  ImageBlock,
+  Heading,
+  TextArea,
+};

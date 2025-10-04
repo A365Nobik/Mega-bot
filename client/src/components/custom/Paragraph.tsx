@@ -1,17 +1,21 @@
-interface IProps {
+import type { IText } from "@/shared/types/text.interface";
+
+interface Props {
+  text?: IText;
   children: React.ReactNode;
-  size?: string;
-  weight?: string;
-  className?: string;
 }
 const Paragraph = ({
+  text = {
+    size: "text-lg",
+  },
   children,
-  size = "text-lg",
-  weight = "font-medium",
-  className,
-}: IProps) => {
+}: Props) => {
   return (
-    <p className={`text-[var(--text-primary)] ${size} ${weight} ${className}`}>
+    <p
+      className={`font-mako ${text.color || "text-[var(--text-primary)]"} ${text.size} ${
+        text.weight
+      } ${text.className}`}
+    >
       {children}
     </p>
   );

@@ -1,17 +1,16 @@
-interface IProps {
+import type { IText } from "@/shared/types/text.interface";
+
+interface Props {
+  text?: IText;
   children: React.ReactNode;
-  size?: string;
-  weight?: string;
-  className?: string;
 }
-const Heading = ({
-  children,
-  size = "text-3xl",
-  weight = "font-medium",
-  className,
-}: IProps) => {
+const Heading = ({ text={size:"text-3xl"}, children }: Props) => {
   return (
-    <h1 className={`text-[var(--text-primary)] ${size} ${weight} ${className}`}>
+    <h1
+      className={`font-mako ${text?.color || "text-[var(--text-primary)]"} ${
+        text?.size
+      } ${text?.weight} ${text?.className || ""}`}
+    >
       {children}
     </h1>
   );
