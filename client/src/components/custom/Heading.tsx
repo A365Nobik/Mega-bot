@@ -4,12 +4,12 @@ interface Props {
   text?: IText;
   children: React.ReactNode;
 }
-const Heading = ({ text={size:"text-3xl"}, children }: Props) => {
+const Heading = ({ text, children }: Props) => {
   return (
     <h1
       className={`font-mako ${text?.color || "text-[var(--text-primary)]"} ${
-        text?.size
-      } ${text?.weight} ${text?.className || ""}`}
+        text?.size || "text-2xl"
+      } ${text?.weight || "font-medium"} ${text?.className || ""}`}
     >
       {children}
     </h1>

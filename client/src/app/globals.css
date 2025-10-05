@@ -65,6 +65,7 @@ body.dark {
   --btn-primary-text: #393e46;
   --btn-secondary-text: var(--text-primary);
   --border-color: var(--text-primary);
+  --border-color-active: #4b70f5;
 }
 body.light {
   --bg-primary: #f0f6fc;

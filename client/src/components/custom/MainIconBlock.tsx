@@ -14,7 +14,7 @@ const MainIconBlock = ({
   return (
     <div
       onClick={onClick}
-      className={`${scale} text-[var(--text-primary)] active:scale-90 active:duration-75 ${className}`}
+      className={`${scale} text-[var(--text-primary)] active:scale-90 active:duration-75 ${className||""}`}
     >
       {children}
     </div>

@@ -8,9 +8,9 @@ export default function Home() {
       <title>Mega-Bot | Домашняя страница</title>
       <div className="flex h-screen">
         <SideBar />
-        <div className="flex-1 flex-col justify-center">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <Header />
-          <div className="flex-1">
+          <div className="flex-1 h-full p-4">
             <Chat />
           </div>
         </div>

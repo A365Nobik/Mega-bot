@@ -1,33 +1,48 @@
 import type { IText } from "@/shared/types/text.interface";
-import type { ChangeEvent } from "react";
+import { forwardRef } from "react";
+import type { ChangeEvent, TextareaHTMLAttributes } from "react";
 
-interface Props {
+interface Props extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   text?: IText;
-  w?: number | string;
-  h?: number | string;
-  placeholder?: string;
-  onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
+  w?: string;
+  h?: string;
+  bg?: string;
 }
-const TextArea = ({
-  text = {
-    size: "lg",
-    weight: "medium",
-    color: "[var(--text-primary)]",
-  },
-  w = "auto",
-  h = "auto",
-  placeholder,
-  onChange,
-}: Props) => {
-  return (
-    <textarea
-      onChange={onChange}
-      spellCheck
-      className={`outline-none resize-none border-1 border-[var(--border-color)] text-${text.color} w-${w} h-${h} font-${text?.weight} text-${text?.size}  ${text?.className}`}
-      name=""
-      id=""
-      placeholder={placeholder}
-    ></textarea>
-  );
-};
+const TextArea = forwardRef<HTMLTextAreaElement, Props>(
+  (
+    {
+      text,
+      w = "w-auto",
+      h = "h-auto",
+      bg,
+      rows,
+      placeholder,
+      maxLength,
+      minLength,
+      onChange,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <textarea
+        ref={ref}
+        rows={rows}
+        maxLength={maxLength}
+        minLength={minLength}
+        onChange={onChange}
+        spellCheck
+        className={`outline-none resize-none ${
+          text?.color || "text-[var(--text-primary)]"
+        }
+      } ${w} ${h} ${bg} ${text?.weight || "font-medium"} ${
+          text?.size || "text-lg"
+        }  ${text?.className}`}
+        placeholder={placeholder}
+        {...props}
+      ></textarea>
+    );
+  }
+);
+TextArea.displayName = "TextArea";
 export default TextArea;

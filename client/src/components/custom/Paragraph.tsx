@@ -4,17 +4,12 @@ interface Props {
   text?: IText;
   children: React.ReactNode;
 }
-const Paragraph = ({
-  text = {
-    size: "text-lg",
-  },
-  children,
-}: Props) => {
+const Paragraph = ({ text, children }: Props) => {
   return (
     <p
-      className={`font-mako ${text.color || "text-[var(--text-primary)]"} ${text.size} ${
-        text.weight
-      } ${text.className}`}
+      className={`font-mako ${text?.color || "text-[var(--text-primary)]"} ${
+        text?.size || "text-lg"
+      } ${text?.weight || "font-medium"} ${text?.className || ""}`}
     >
       {children}
     </p>
