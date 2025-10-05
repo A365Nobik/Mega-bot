@@ -1,6 +1,6 @@
 from typing import Optional
-from app.services.chat_service import ChatService
-from app.services.session_service import SessionService
+from ..services.chat_service import ChatService
+from ..services.session_service import SessionService
 
 _chat_service: Optional[ChatService] = None
 _session_service: Optional[SessionService] = None

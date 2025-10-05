@@ -4,7 +4,7 @@ import time
 from typing import Optional
 import aiohttp
 
-from app.models.chat import ResponseType
+from ...models.chat import ResponseType
 
 
 class BaseAIModel(ABC):
@@ -17,7 +17,7 @@ class BaseAIModel(ABC):
 
     @property
     def status(self) -> str:
-        return (self._status,)
+        return self._status
 
     @property
     def last_response_time(self) -> Optional[float]:
