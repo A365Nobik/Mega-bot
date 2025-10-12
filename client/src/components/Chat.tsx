@@ -4,7 +4,9 @@ import { ArrowUp } from "@deemlol/next-icons";
 import { Heading, TextArea, Paragraph, Button } from "./custom";
 import { getWelcomeMessages } from "@/shared/constants/welcome-messages";
 import { useState, useRef, useEffect } from "react";
+import ModelsCard from "./ModelsCard";
 import type { ChangeEvent } from "react";
+
 
 interface Props {}
 
@@ -50,6 +52,7 @@ const Chat = ({}: Props) => {
             Привет (логин)!
           </Heading>
           <Heading text={{ size: "text-6xl" }}>{welcome}</Heading>
+          <ModelsCard/>
         </div>
       )}
       <div className="w-full flex flex-col justify-end items-center">
