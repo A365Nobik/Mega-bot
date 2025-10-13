@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from ....core.dependencies import get_session_service
-from ....models.session import SessionListResponse, SessionResponse
-from ....services.session_service import SessionService
+from app.core.dependencies import get_session_service
+from app.models.session import SessionListResponse, SessionResponse
+from app.services.session_service import SessionService
 
 router = APIRouter()
 

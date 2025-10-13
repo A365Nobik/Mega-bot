@@ -23,7 +23,7 @@ class StreamEventType(str, Enum):
 class ChatMessageRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=2000)
     session_id: Optional[str] = None
-    starting_model: Optional[str] = "Deepseek"
+    starting_model: Optional[str] = "Yandex"
 
 
 class ModelResponse(BaseModel):

@@ -2,9 +2,9 @@ from datetime import datetime
 import json
 from typing import AsyncGenerator, Dict, Optional
 from uuid import uuid4
-from .ai_models import DeepSeekModel, YandexGPTModel, GigaChatModel
-from .session_service import SessionService
-from ..models.chat import (
+from app.services.ai_models import DeepSeekModel, YandexGPTModel, GigaChatModel
+from app.services import SessionService
+from app.models.chat import (
     ChatResponse,
     ConversationEntry,
     ModelResponse,
@@ -12,7 +12,7 @@ from ..models.chat import (
     StreamEvent,
     StreamEventType,
 )
-from ..core.config import settings
+from app.core.config import settings
 
 
 class ChatService:
@@ -23,6 +23,15 @@ class ChatService:
             "GigaChat": GigaChatModel(),
         }
         self.session_service = SessionService()
+
+    def _resolve_model_name(self, name: Optional[str]) -> Optional[str]:
+        if not name:
+            return None
+        lower = name.lower()
+        for key in self.models.keys():
+            if key.lower() == lower:
+                return key
+        return None
 
     async def process_message(
         self,
@@ -36,7 +45,12 @@ class ChatService:
         session = await self.session_service.get_or_create_session(session_id)
 
         try:
-            current_model = starting_model
+            resolved = self._resolve_model_name(starting_model)
+            if not resolved:
+                raise Exception(
+                    f"Неизвестная модель: {starting_model}. Доступные: {', '.join(self.models.keys())}"
+                )
+            current_model = resolved
             iterations = 0
 
             while iterations < settings.MAX_ITERATIONS:
@@ -69,7 +83,7 @@ class ChatService:
                         conversation_history=session.conversation_history,
                     )
 
-                elif parsed_response.respone_type == ResponseType.USER_QUESTION:
+                elif parsed_response.response_type == ResponseType.USER_QUESTION:
                     return ChatResponse(
                         response=f"Дополнительный вопрос от {current_model}: {parsed_response.body}",
                         session_id=session_id,
@@ -105,13 +119,21 @@ class ChatService:
     ) -> AsyncGenerator[StreamEvent, None]:
         session = await self.session_service.get_or_create_session(session_id)
 
+        resolved = self._resolve_model_name(starting_model)
+        if not resolved:
+            yield StreamEvent(
+                type=StreamEventType.ERROR,
+                message=f"Неизвестная модель: {starting_model}. Доступные: {', '.join(self.models.keys())}",
+            )
+            return
+
         yield StreamEvent(
             type=StreamEventType.START,
-            model=starting_model,
-            message=f"Начинаю обработку с модели {starting_model}",
+            model=resolved,
+            message=f"Начинаю обработку с модели {resolved}",
         )
 
-        current_model = starting_model
+        current_model = resolved
         iterations = 0
 
         try:

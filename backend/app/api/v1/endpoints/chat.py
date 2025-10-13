@@ -1,9 +1,9 @@
 import json
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
-from ....models.chat import ChatMessageRequest, ChatResponse
-from ....core.dependencies import get_chat_service
-from ....services.chat_service import ChatService
+from app.models.chat import ChatMessageRequest, ChatResponse
+from app.core.dependencies import get_chat_service
+from app.services.chat_service import ChatService
 
 router = APIRouter()
 

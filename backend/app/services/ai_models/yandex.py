@@ -1,7 +1,7 @@
 import random
-from ...models.chat import ResponseType
+from app.models.chat import ResponseType
 from .base import BaseAIModel
-from ...core.config import settings
+from app.core.config import settings
 import json
 
 
@@ -30,16 +30,16 @@ class YandexGPTModel(BaseAIModel):
     async def _parse_response(self, response_data: dict) -> str:
         responses = [
             {
-                "response_type": ResponseType.FINAL_ANSWER,
+                "response_type": ResponseType.FINAL_ANSWER.value,
                 "body": "YandexGPT: Проанализировал ваш запрос с учетом особенностей и контекста. Готов предоставить финальный вариант с учетом ваших предпочтений",
             },
             {
-                "response_type": ResponseType.REQUEST_TO_MODEL,
+                "response_type": ResponseType.REQUEST_TO_MODEL.value,
                 "body": "Направляю ответ к DeepSeek для более глубокого анализа",
                 "target_model": "DeepSeek",
             },
             {
-                "response_type": ResponseType.REQUEST_TO_MODEL,
+                "response_type": ResponseType.REQUEST_TO_MODEL.value,
                 "body": "Направляю новые данные к GigaChat для финализации ответа",
                 "target_model": "GigaChat",
             },
@@ -50,7 +50,7 @@ class YandexGPTModel(BaseAIModel):
         return "Общие вопросы, анализ текста, перевод, математика, анализ данных"
 
     def _get_headers(self) -> dict:
-        """Переопределяем метод для специфичных заголовков YandexGPT"""
+        """Переопределяем метод для спецефичных заголовков YandexGPT"""
 
         return {
             "Content-Type": "application/json",

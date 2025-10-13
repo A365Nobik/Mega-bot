@@ -1,6 +1,6 @@
 import json
-from ...core.config import settings
-from ...models.chat import ResponseType
+from app.core.config import settings
+from app.models.chat import ResponseType
 from .base import BaseAIModel
 
 
@@ -29,7 +29,7 @@ class GigaChatModel(BaseAIModel):
     async def _parse_response(self, response_data: dict) -> str:
         return json.dumps(
             {
-                "response_type": ResponseType.FINAL_ANSWER,
+                "response_type": ResponseType.FINAL_ANSWER.value,
                 "body": "GigaChat: Сгенерировал итоговое решение на основе коллективного обсуждения. Вот креативный и практичный ответ с учетом мнения всех предыдущих ассистентов",
             },
             ensure_ascii=False,

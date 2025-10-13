@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
-from .chat import ConversationEntry
+from app.models.chat import ConversationEntry
 
 
 class Session(BaseModel):

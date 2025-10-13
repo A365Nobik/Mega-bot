@@ -1,6 +1,6 @@
 import random
-from ...core.config import settings
-from ...models.chat import ResponseType
+from app.core.config import settings
+from app.models.chat import ResponseType
 from .base import BaseAIModel
 import json
 
@@ -33,13 +33,13 @@ class DeepSeekModel(BaseAIModel):
     async def _parse_response(self, response_data: dict) -> str:
         responses = [
             {
-                "response_type": ResponseType.FINAL_ANSWER,
+                "response_type": ResponseType.FINAL_ANSWER.value,
                 "body": "DeepSeek: Провел технический анализ. Предоставляю готовое детальное решение с пошаговым разбором и рекомендациями",
             },
             {
-                "response_type": ResponseType.REQUEST_TO_MODEL,
+                "response_type": ResponseType.REQUEST_TO_MODEL.value,
                 "body": "Требуется получить дополнительный анализ от GigaChat для финального решения",
-                "taget_model": "GigaChat",
+                "target_model": "GigaChat",
             },
         ]
         return json.dumps(random.choice(responses), ensure_ascii=False)

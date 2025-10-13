@@ -4,7 +4,7 @@ import time
 from typing import Optional
 import aiohttp
 
-from ...models.chat import ResponseType
+from app.models.chat import ResponseType
 
 
 class BaseAIModel(ABC):
