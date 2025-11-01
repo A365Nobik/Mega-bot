@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 from typing import AsyncGenerator, Dict, Optional
 from uuid import uuid4
-from app.services.ai_models import DeepSeekModel, YandexGPTModel, GigaChatModel
+from app.services.ai_models import DeepSeekModel, GeminiModel, GigaChatModel
 from app.services import SessionService
 from app.models.chat import (
     ChatResponse,
@@ -18,7 +18,7 @@ from app.core.config import settings
 class ChatService:
     def __init__(self):
         self.models = {
-            "Yandex": YandexGPTModel(),
+            "Gemini": GeminiModel(),
             "DeepSeek": DeepSeekModel(),
             "GigaChat": GigaChatModel(),
         }
@@ -37,7 +37,7 @@ class ChatService:
         self,
         message: str,
         session_id: Optional[str] = None,
-        starting_model: str = "Yandex",
+        starting_model: str = "Gemini",
     ) -> ChatResponse:
         if not session_id:
             session_id = str(uuid4())
@@ -92,11 +92,14 @@ class ChatService:
                     )
 
                 elif parsed_response.response_type == ResponseType.REQUEST_TO_MODEL:
-                    if parsed_response.target_model in self.models:
-                        current_model = parsed_response.target_model
+                    resolved_target = self._resolve_model_name(
+                        parsed_response.target_model
+                    )
+                    if resolved_target:
+                        current_model = resolved_target
                     else:
                         raise Exception(
-                            f"Неизвестная модель: {parsed_response.target_model}"
+                            f"Неизвестная модель: {parsed_response.target_model}. Доступные: {', '.join(self.models.keys())}"
                         )
 
             return ChatResponse(
@@ -115,7 +118,7 @@ class ChatService:
             )
 
     async def process_message_stream(
-        self, message: str, session_id: str, starting_model: str = "Yandex"
+        self, message: str, session_id: str, starting_model: str = "Gemini"
     ) -> AsyncGenerator[StreamEvent, None]:
         session = await self.session_service.get_or_create_session(session_id)
 
@@ -192,17 +195,20 @@ class ChatService:
                     return
 
                 elif parsed_response.response_type == ResponseType.REQUEST_TO_MODEL:
-                    if parsed_response.target_model in self.models:
+                    resolved_target = self._resolve_model_name(
+                        parsed_response.target_model
+                    )
+                    if resolved_target:
                         yield StreamEvent(
                             type=StreamEventType.REDIRECT,
                             from_model=current_model,
-                            to_model=parsed_response.target_model,
+                            to_model=resolved_target,
                         )
-                        current_model = parsed_response.target_model
+                        current_model = resolved_target
                     else:
                         yield StreamEvent(
                             type=StreamEventType.ERROR,
-                            message=f"Неизвестная модель: {parsed_response.target_model}",
+                            message=f"Неизвестная модель: {parsed_response.target_model}. Доступные: {', '.join(self.models.keys())}",
                         )
                         return
 

@@ -1,5 +1,5 @@
 from .deepseek import DeepSeekModel
-from .yandex import YandexGPTModel
+from .gemini import GeminiModel
 from .gigachat import GigaChatModel
 
-__all__ = ["DeepSeekModel", "YandexGPTModel", "GigaChatModel"]
+__all__ = ["DeepSeekModel", "GeminiModel", "GigaChatModel"]

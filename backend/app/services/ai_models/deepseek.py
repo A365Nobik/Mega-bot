@@ -1,8 +1,7 @@
-import random
+import json
+from .base import BaseAIModel
 from app.core.config import settings
 from app.models.chat import ResponseType
-from .base import BaseAIModel
-import json
 
 
 class DeepSeekModel(BaseAIModel):
@@ -17,32 +16,34 @@ class DeepSeekModel(BaseAIModel):
         return {
             "model": "deepseek-chat",
             "messages": [
-                {
-                    "role": "system",
-                    "content": "You are DeepSeek, a helpful AI assistant specialized in deep technical analysis",
-                },
-                {
-                    "role": "user",
-                    "content": prompt,
-                },
+                {"role": "system", "content": "You are DeepSeek AI assistant."},
+                {"role": "user", "content": prompt},
             ],
             "stream": False,
             "temperature": 0.3,
+            "max_tokens": 2000,
         }
 
     async def _parse_response(self, response_data: dict) -> str:
-        responses = [
+        from .helpers import extract_json_from_markdown
+
+        try:
+            response_text = response_data["choices"][0]["message"]["content"]
+        except (KeyError, IndexError):
+            response_text = str(response_data)
+
+        extracted_json = extract_json_from_markdown(response_text)
+
+        if extracted_json:
+            return json.dumps(extracted_json, ensure_ascii=False)
+
+        return json.dumps(
             {
                 "response_type": ResponseType.FINAL_ANSWER.value,
-                "body": "DeepSeek: Провел технический анализ. Предоставляю готовое детальное решение с пошаговым разбором и рекомендациями",
+                "body": f"DeepSeek: {response_text}",
             },
-            {
-                "response_type": ResponseType.REQUEST_TO_MODEL.value,
-                "body": "Требуется получить дополнительный анализ от GigaChat для финального решения",
-                "target_model": "GigaChat",
-            },
-        ]
-        return json.dumps(random.choice(responses), ensure_ascii=False)
+            ensure_ascii=False,
+        )
 
     def _get_specialization(self) -> str:
-        return "Глубокий технический анализ, алгоритмы, системная архитектура"
+        return "Глубокий технический анализ, алгоритмы, архитектура"

@@ -17,7 +17,7 @@ async def chat_endpoint(
         result = await chat_service.process_message(
             message=message_request.message,
             session_id=message_request.session_id,
-            starting_model=message_request.starting_model or "Yandex",
+            starting_model=message_request.starting_model or "Gemini",
         )
         return result
     except Exception as e:
@@ -31,10 +31,10 @@ async def chat_endpoint(
 async def chat_stream_endpoint(
     session_id: str,
     prompt: str,
-    starting_model: str = "Yandex",
+    starting_model: str = "Gemini",
     chat_service: ChatService = Depends(get_chat_service),
 ):
-    valid_models = ["Yandex", "DeepSeek", "GigaChat"]
+    valid_models = ["Gemini", "DeepSeek", "GigaChat"]
     if starting_model not in valid_models:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
