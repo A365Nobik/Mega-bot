@@ -13,4 +13,4 @@ export {
   ImageBlock,
   Heading,
   TextArea,
-};TextArea
+};

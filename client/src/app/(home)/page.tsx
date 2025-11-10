@@ -1,6 +1,6 @@
 import { SideBar, Header } from "@/components";
-import Chat from "@/components/Chat";
-import { Paragraph } from "@/components";
+import Chat from "@/components/chat/Chat";
+// import { Paragraph } from "@/components";
 
 export default function Home() {
   return (

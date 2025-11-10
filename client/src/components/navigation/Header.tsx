@@ -5,7 +5,7 @@ import Link from "next/link";
 const Header = () => {
   const primaryBtnClass: string = "rounded-xl";
   return (
-    <header className="w-full flex gap-2 px-2 py-4 animate-appear ">
+    <header className="w-full flex gap-2 px-2 py-4 animate-appear transition-colors duration-400 hover:bg-[var(--bg-secondary)]">
       <div className="flex justify-center items-center gap-2">
         <HomeIconLink divClass="mr-auto ml-15" />
         <Paragraph text={{ size: "text-xl" }}>Mega-Bot</Paragraph>

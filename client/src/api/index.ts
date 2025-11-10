@@ -1,4 +1,5 @@
 import getModels from "./models";
-import  api  from "./axios";
+import api from "./axios";
+import sendSingleMessage from "./chat/sendSingleMessage";
 
-export { getModels,api };
+export { api, getModels, sendSingleMessage };

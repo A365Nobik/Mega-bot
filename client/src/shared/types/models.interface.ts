@@ -1,3 +1,4 @@
+import type { Models } from "./chat";
 type Status = "active" | "inactive" | "error";
 interface IModel {
   last_response_time?: string;
@@ -7,7 +8,7 @@ interface IModel {
 }
 
 export interface IModels {
-  available: string[];
+  available:Models[];
   models: Record<string, IModel>;
   total: number;
 }

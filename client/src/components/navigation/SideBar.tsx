@@ -141,7 +141,7 @@ const SideBar = () => {
               className="object-cover"
             />
           </div>
-          <div className="flex flex-col justify-stert items-start">
+          <div className="flex flex-col justify-start items-start">
             <Paragraph
               text={{
                 className: `text-xl animate-side-appear ${!isOpen && "w-0"}`,
