@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 from typing import AsyncGenerator, Dict, Optional
 from uuid import uuid4
-from app.services.ai_models import DeepSeekModel, YandexGPTModel, GigaChatModel
+from app.services.ai_models import DeepSeekModel, GeminiModel, GigaChatModel
 from app.services import SessionService
 from app.models.chat import (
     ChatResponse,
@@ -16,19 +16,28 @@ from app.core.config import settings
 
 
 class ChatService:
-    def __init__(self):
+    def __init__(self, session_service: SessionService = None):
         self.models = {
-            "Yandex": YandexGPTModel(),
+            "Gemini": GeminiModel(),
             "DeepSeek": DeepSeekModel(),
             "GigaChat": GigaChatModel(),
         }
-        self.session_service = SessionService()
+        self.session_service = session_service or SessionService()
+
+    def _resolve_model_name(self, name: Optional[str]) -> Optional[str]:
+        if not name:
+            return None
+        lower = name.lower()
+        for key in self.models.keys():
+            if key.lower() == lower:
+                return key
+        return None
 
     async def process_message(
         self,
         message: str,
         session_id: Optional[str] = None,
-        starting_model: str = "Yandex",
+        starting_model: str = "Gemini",
     ) -> ChatResponse:
         if not session_id:
             session_id = str(uuid4())
@@ -36,7 +45,12 @@ class ChatService:
         session = await self.session_service.get_or_create_session(session_id)
 
         try:
-            current_model = starting_model
+            resolved = self._resolve_model_name(starting_model)
+            if not resolved:
+                raise Exception(
+                    f"Неизвестная модель: {starting_model}. Доступные: {', '.join(self.models.keys())}"
+                )
+            current_model = resolved
             iterations = 0
 
             while iterations < settings.MAX_ITERATIONS:
@@ -69,7 +83,7 @@ class ChatService:
                         conversation_history=session.conversation_history,
                     )
 
-                elif parsed_response.respone_type == ResponseType.USER_QUESTION:
+                elif parsed_response.response_type == ResponseType.USER_QUESTION:
                     return ChatResponse(
                         response=f"Дополнительный вопрос от {current_model}: {parsed_response.body}",
                         session_id=session_id,
@@ -78,11 +92,14 @@ class ChatService:
                     )
 
                 elif parsed_response.response_type == ResponseType.REQUEST_TO_MODEL:
-                    if parsed_response.target_model in self.models:
-                        current_model = parsed_response.target_model
+                    resolved_target = self._resolve_model_name(
+                        parsed_response.target_model
+                    )
+                    if resolved_target:
+                        current_model = resolved_target
                     else:
                         raise Exception(
-                            f"Неизвестная модель: {parsed_response.target_model}"
+                            f"Неизвестная модель: {parsed_response.target_model}. Доступные: {', '.join(self.models.keys())}"
                         )
 
             return ChatResponse(
@@ -101,17 +118,25 @@ class ChatService:
             )
 
     async def process_message_stream(
-        self, message: str, session_id: str, starting_model: str = "Yandex"
+        self, message: str, session_id: str, starting_model: str = "Gemini"
     ) -> AsyncGenerator[StreamEvent, None]:
         session = await self.session_service.get_or_create_session(session_id)
 
+        resolved = self._resolve_model_name(starting_model)
+        if not resolved:
+            yield StreamEvent(
+                type=StreamEventType.ERROR,
+                message=f"Неизвестная модель: {starting_model}. Доступные: {', '.join(self.models.keys())}",
+            )
+            return
+
         yield StreamEvent(
             type=StreamEventType.START,
-            model=starting_model,
-            message=f"Начинаю обработку с модели {starting_model}",
+            model=resolved,
+            message=f"Начинаю обработку с модели {resolved}",
         )
 
-        current_model = starting_model
+        current_model = resolved
         iterations = 0
 
         try:
@@ -139,18 +164,25 @@ class ChatService:
                     model=current_model,
                     response=parsed_response.body,
                     response_type=parsed_response.response_type,
+                    timestamp=datetime.now(),
                 )
 
                 await self.session_service.add_conversation_entry(
                     session_id, conversation_entry
                 )
 
-                yield StreamEvent(
-                    type=StreamEventType.MODEL_RESPONSE,
-                    model=current_model,
-                    response=parsed_response.body,
-                    response_type=parsed_response.response_type,
+                is_error_response = (
+                    "Извините" in parsed_response.body
+                    and "временно недоступен" in parsed_response.body
                 )
+
+                if not is_error_response:
+                    yield StreamEvent(
+                        type=StreamEventType.MODEL_RESPONSE,
+                        model=current_model,
+                        response=parsed_response.body,
+                        response_type=parsed_response.response_type,
+                    )
 
                 if parsed_response.response_type == ResponseType.FINAL_ANSWER:
                     session = await self.session_service.get_session(session_id)
@@ -170,17 +202,20 @@ class ChatService:
                     return
 
                 elif parsed_response.response_type == ResponseType.REQUEST_TO_MODEL:
-                    if parsed_response.target_model in self.models:
+                    resolved_target = self._resolve_model_name(
+                        parsed_response.target_model
+                    )
+                    if resolved_target:
                         yield StreamEvent(
                             type=StreamEventType.REDIRECT,
                             from_model=current_model,
-                            to_model=parsed_response.target_model,
+                            to_model=resolved_target,
                         )
-                        current_model = parsed_response.target_model
+                        current_model = resolved_target
                     else:
                         yield StreamEvent(
                             type=StreamEventType.ERROR,
-                            message=f"Неизвестная модель: {parsed_response.target_model}",
+                            message=f"Неизвестная модель: {parsed_response.target_model}. Доступные: {', '.join(self.models.keys())}",
                         )
                         return
 

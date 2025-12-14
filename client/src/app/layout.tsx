@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "@/provider";
+import { Providers } from "@/provider";
 
 export const metadata: Metadata = {
   title: "Mega-bot",
-  description: "Сайт, содержащий один чат, сразу с несолькоми ИИ ботами.",
+  description:
+    "Сайт, содержащий один чат, сразу с несколькими ИИ ассистентами.",
 };
 
 export default function RootLayout({
@@ -14,8 +15,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`bg-[var(--bg-primary)]  antialiased font-mako`}>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body className={`bg-(--bg-primary)  antialiased font-mako`}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

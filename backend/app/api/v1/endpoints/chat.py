@@ -1,4 +1,6 @@
+from uuid import uuid4
 import json
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from app.models.chat import ChatMessageRequest, ChatResponse
@@ -17,7 +19,7 @@ async def chat_endpoint(
         result = await chat_service.process_message(
             message=message_request.message,
             session_id=message_request.session_id,
-            starting_model=message_request.starting_model or "Yandex",
+            starting_model=message_request.starting_model or "Gemini",
         )
         return result
     except Exception as e:
@@ -27,14 +29,56 @@ async def chat_endpoint(
         )
 
 
-@router.get("/stream/{session_id}")
+@router.get("/stream")
 async def chat_stream_endpoint(
-    session_id: str,
     prompt: str,
-    starting_model: str = "Yandex",
+    session_id: Optional[str] = None,
+    starting_model: str = "Gemini",
     chat_service: ChatService = Depends(get_chat_service),
 ):
-    valid_models = ["Yandex", "DeepSeek", "GigaChat"]
+    valid_models = ["Gemini", "DeepSeek", "GigaChat"]
+    if starting_model not in valid_models:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Неправильное название модели. Должна быть одной из: {', '.join(valid_models)}",
+        )
+
+    if not session_id:
+        session_id = str(uuid4())
+
+    async def generate_stream():
+        try:
+            async for event in chat_service.process_message_stream(
+                message=prompt, session_id=session_id, starting_model=starting_model
+            ):
+                payload = {
+                    "session_id": session_id,
+                    "event": event.model_dump(mode="json"),
+                }
+                yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+        except Exception as e:
+            error_event = {"type": "error", "message": f"Ошибка стриминга: {str(e)}"}
+            yield f"data: {json.dumps(error_event, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(
+        generate_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@router.get("/stream/{session_id}")
+async def chat_stream_with_session_endpoint(
+    session_id: str,
+    prompt: str,
+    starting_model: str = "Gemini",
+    chat_service: ChatService = Depends(get_chat_service),
+):
+    valid_models = ["Gemini", "DeepSeek", "GigaChat"]
     if starting_model not in valid_models:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -46,19 +90,22 @@ async def chat_stream_endpoint(
             async for event in chat_service.process_message_stream(
                 message=prompt, session_id=session_id, starting_model=starting_model
             ):
-                event_data = event.model_dump()
-                yield f"data: {json.dumps(event_data, default=str, ensure_ascii=False)}\n\n"
+                payload = {
+                    "session_id": session_id,
+                    "event": event.model_dump(mode="json"),
+                }
+                yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
         except Exception as e:
             error_event = {"type": "error", "message": f"Ошибка стриминга: {str(e)}"}
             yield f"data: {json.dumps(error_event, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(
         generate_stream(),
-        media_type="text/plain",
+        media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
-            "Content-Type": "text/event-stream",
+            "X-Accel-Buffering": "no",
         },
     )
 

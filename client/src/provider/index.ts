@@ -1,4 +1,4 @@
-import { ThemeProvider } from "./ThemeProvider";
-import { ThemeContext } from "./ThemeProvider";
+import { Providers } from "./Providers";
+import { ChatHistoryProvider } from "./HistoryProvider";
 
-export { ThemeContext, ThemeProvider };
+export { Providers, ChatHistoryProvider };
