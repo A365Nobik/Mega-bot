@@ -15,11 +15,6 @@ const TextArea = forwardRef<HTMLTextAreaElement, Props>(
       w = "w-auto",
       h = "h-auto",
       bg,
-      rows,
-      placeholder,
-      maxLength,
-      minLength,
-      onChange,
       ...props
     },
     ref
@@ -27,10 +22,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, Props>(
     return (
       <textarea
         ref={ref}
-        rows={rows}
-        maxLength={maxLength}
-        minLength={minLength}
-        onChange={onChange}
+        
         spellCheck
         className={`outline-none resize-none ${
           text?.color || "text-[var(--text-primary)]"
@@ -38,7 +30,6 @@ const TextArea = forwardRef<HTMLTextAreaElement, Props>(
       } ${w} ${h} ${bg} ${text?.weight || "font-medium"} ${
           text?.size || "text-lg"
         }  ${text?.className}`}
-        placeholder={placeholder}
         {...props}
       ></textarea>
     );

@@ -1,5 +1,5 @@
 import type { AxiosError } from "axios";
-import api from "../axios";
+import {api} from "@/api/";
 import type { ISingleResponse, ISingleRequest } from "@/shared/types/chat";
 
 const sendSingleMessage = async (
@@ -7,7 +7,7 @@ const sendSingleMessage = async (
 ): Promise<ISingleResponse> => {
   try {
     const response = await api.post<ISingleResponse>(
-      "http://localhost:8000/api/v1/chat/",
+      "/chat/",
       {
         message: props.message.trim(),
         session_id: props.session_id,
@@ -16,11 +16,12 @@ const sendSingleMessage = async (
     );
     return response.data;
   } catch (error) {
-    const axiosError = error as AxiosError<{ details?: string }>;
+    const axiosError = error as AxiosError;
     if (axiosError.response) {
       const status = axiosError.response.status;
       const details =
-        axiosError.response.data?.details || axiosError.response.statusText;
+        (axiosError.response.data as any)?.details ||
+        axiosError.response.statusText;
       throw new Error(`Ошибка ${status}, ${details}`);
     } else if (axiosError.request) {
       throw new Error("Сервер не отвечает");

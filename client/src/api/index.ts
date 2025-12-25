@@ -1,6 +1,6 @@
-import getModels from "./models";
+import getModels from "./chat/models";
+import api from "./axios";
 import sendSingleMessage from "./chat/sendSingleMessage";
 import sendSteamMessage from "./chat/sendSteamMessage";
 
-export { default as api } from "./axios";
-export { getModels, sendSingleMessage, sendSteamMessage };
+export { api, getModels, sendSingleMessage, sendSteamMessage };

@@ -1,10 +1,10 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "@deemlol/next-icons";
-import { Heading, Paragraph, TextArea, Button, TextSwitch } from "../custom";
+import { Heading, Paragraph, TextArea, Button, TextSwitch } from "..";
 import { getWelcomeMessages } from "@/shared/constants/";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ModelsCard, Message } from "@/components/chat";
+import { ModelsCard, Message } from "@/components/custom/chat";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import type { IMessage, Models } from "@/shared/types/chat";
 import type { IModels } from "@/shared/types/models.interface";
@@ -361,13 +361,13 @@ const Chat = () => {
             />
           </motion.div>
           <div className="flex justify-end items-center gap-2 shrink-0">
-            {models?.available.length !== 0 && (
+            {models?.available?.length !== 0 && (
               <select
                 title="Начальная модель"
                 className="text-(--text-primary) text-lg transition-colors hover:bg-(--bg-primary) p-1 rounded-lg duration-200"
                 onChange={startingModelChange}
               >
-                {models?.available.map((model, idx) => (
+                {models?.available?.map((model, idx) => (
                   <option key={idx} value={model}>
                     {model}
                   </option>
@@ -375,7 +375,7 @@ const Chat = () => {
               </select>
             )}
             {/* для разработки */}
-            {models?.models && (
+            {/* {models?.models && (
               <select onChange={startingModelChange}>
                 {Object.values(models.models).map((el, idx) => (
                   <option key={idx} value={el.name}>
@@ -383,7 +383,7 @@ const Chat = () => {
                   </option>
                 ))}
               </select>
-            )}
+            )} */}
             <TextSwitch value={defaultRequest} setValue={setDefaultRequest}>
               <Paragraph text={{ size: "text-md" }}>Обычный запрос</Paragraph>
             </TextSwitch>
@@ -398,13 +398,13 @@ const Chat = () => {
             </div>
             <Button
               title={
-                models?.available.length !== 0
+                models?.available?.length !== 0
                   ? "Отправить запрос"
                   : "Нет доступных моделей"
               }
               onClick={sendMessageClick}
               disabled={
-                models?.available.length === 0 ||
+                models?.available?.length === 0 ||
                 !hasContent ||
                 isOverLength ||
                 !startingModel

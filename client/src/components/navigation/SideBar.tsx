@@ -75,7 +75,8 @@ const SideBar = () => {
 
   const deleteChat = (key: string) => {
     localStorage.removeItem(key);
-    router.replace("/");
+    router.replace("/ё");
+    location.reload();
   };
 
   return (
@@ -228,9 +229,7 @@ const SideBar = () => {
                             <Button
                               title="Удалить чат"
                               defaultHover={false}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
+                              onClick={() => {
                                 deleteChat(el);
                               }}
                               className="bg-red-700 hover:bg-red-600 p-1 rounded-lg ml-2"
