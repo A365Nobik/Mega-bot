@@ -1,7 +1,7 @@
 "use client";
-
+import { Copy } from "@deemlol/next-icons";
 import type { IMessage } from "@/shared/types/chat";
-import { MainIconBlock, Paragraph } from "@/components/custom";
+import { Button, MainIconBlock, Paragraph } from "@/components/custom";
 import { dateFormatter } from "@/shared/constants";
 import MainIcon from "@/assets/svg/MainIcon";
 import { User } from "@deemlol/next-icons";
@@ -25,6 +25,12 @@ const Message = memo(({ message }: IProps) => {
     };
   }, [message.timestamp]);
 
+  const copyMessage = () => {
+    if (message.text) {
+      navigator.clipboard.writeText(message.text);
+    }
+  };
+
   return (
     <div
       className={`bg-(--bg-secondary) p-4 rounded-lg max-w-[80%] ${
@@ -32,7 +38,7 @@ const Message = memo(({ message }: IProps) => {
       }`}
     >
       <div className="flex items-center gap-2">
-        <MainIconBlock>
+        <MainIconBlock defaultActive={false}>
           {message.sender === "user" ? (
             <User size={20} />
           ) : (
@@ -43,7 +49,20 @@ const Message = memo(({ message }: IProps) => {
           {message.sender === "user" ? "Вы" : message.model}
         </Paragraph>
       </div>
-      <Paragraph>{message.text}</Paragraph>
+      <div className="flex items-end gap-2 group">
+        <Paragraph>{message.text}</Paragraph>
+        <Button
+          text={{ size: "text-sm" }}
+          className="opacity-0 scale-0 duration-300 delay-75"
+          defaultActive={false}
+          defaultHover={false}
+          hover="group-hover:opacity-100 group-hover:scale-100"
+          active="active:scale-80"
+          onClick={copyMessage}
+        >
+          <Copy />
+        </Button>
+      </div>
       <Paragraph text={{ size: "text-sm" }}>{sended}</Paragraph>
     </div>
   );

@@ -47,8 +47,17 @@ class BaseAIModel(ABC):
                 ) as response:
                     if response.status != 200:
                         self._status = "error"
+                        error_text = await response.text()
                         raise Exception(
-                            f"API request failed with status {response.status}"
+                            f"API request failed with status {response.status}: {error_text[:200]}"
+                        )
+
+                    content_type = response.headers.get("Content-Type", "").lower()
+                    if "application/json" not in content_type:
+                        self._status = "error"
+                        error_text = await response.text()
+                        raise Exception(
+                            f"Unexpected content type: {content_type}. Response: {error_text[:200]}"
                         )
 
                     response_data = await response.json()
@@ -67,7 +76,9 @@ class BaseAIModel(ABC):
     def _get_headers(self) -> dict:
         headers = {"Content-Type": "application/json"}
         if self.api_key:
-            headers["Authorization"] = f"Bearer {self.api_key}"
+            headers["Authorization"] = f"Bearer {self.api_key.strip()}"
+        else:
+            print(f"WARNING: No API key provided for {self.name}")
         return headers
 
     async def _get_fallback_response(self, error_msg: str) -> str:

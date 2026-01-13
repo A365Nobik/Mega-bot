@@ -25,15 +25,15 @@ class Settings(BaseSettings):
     DEEPSEEK_API_KEY: Optional[str] = None
     DEEPSEEK_API_URL: str = "https://api.deepseek.com/v1/chat/completions"
 
+    YANDEX_API_KEY: Optional[str] = None
+    YANDEX_FOLDER_ID: Optional[str] = None
+    YANDEX_API_URL: str = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+
     GIGACHAT_API_KEY: Optional[str] = None
     GIGACHAT_API_URL: str = (
         "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
     )
 
-    GEMINI_API_KEY: Optional[str] = None
-    GEMINI_API_URL: ClassVar[str] = (
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
-    )
 
     MAX_ITERATIONS: int = 10
     SESSION_TIMEOUT: int = 3600

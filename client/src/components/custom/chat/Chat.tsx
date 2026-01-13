@@ -29,6 +29,7 @@ const Chat = () => {
   const [hasContent, setHacContent] = useState<boolean>(false);
   const [defaultRequest, setDefaultRequest] = useState<boolean>(false);
   const [sessionId, setSessionId] = useState<string>("");
+  const currentModelMessageIndexRef = useRef<number>(-1);
   const params = useParams();
   const { refreshHistory } = useChatHistory();
 
@@ -194,6 +195,8 @@ const Chat = () => {
           console.error(error);
         }
       } else {
+        currentModelMessageIndexRef.current = -1;
+        
         try {
           await sendSteamMessage(
             {
@@ -202,55 +205,167 @@ const Chat = () => {
               session_id: sessionId,
             },
             (event) => {
-              const newMessage: IMessage = {
-                sender: "assistant",
-                text: "",
-                timestamp: new Date(),
-                model: event.model || startingModel || undefined,
-              };
+              const currentModel = event.model || undefined;
 
               switch (event.type) {
                 case "start":
-                  newMessage.text =
-                    event.message ||
-                    `Начинаю обработку с модели ${
-                      event.model || startingModel
-                    }`;
+                  const startMessage: IMessage = {
+                    sender: "assistant",
+                    text:
+                      event.message ||
+                      `Начинаю обработку с модели ${currentModel}`,
+                    timestamp: new Date(),
+                    model: currentModel,
+                  };
+                  setMessages((prev) => {
+                    const newMessages = [...prev, startMessage];
+                    currentModelMessageIndexRef.current = newMessages.length - 1;
+                    return newMessages;
+                  });
                   break;
 
                 case "processing":
-                  newMessage.text = `Обработка моделью ${
-                    event.model || startingModel
-                  }...`;
+                  setMessages((prev) => {
+                    const newMessages = [...prev];
+                    const index = currentModelMessageIndexRef.current;
+                    if (index >= 0 && index < newMessages.length) {
+                      newMessages[index] = {
+                        ...newMessages[index],
+                        text: `Обработка моделью ${currentModel}...`,
+                        model: currentModel,
+                      };
+                    } else {
+                      const processingMessage: IMessage = {
+                        sender: "assistant",
+                        text: `Обработка моделью ${currentModel}...`,
+                        timestamp: new Date(),
+                        model: currentModel,
+                      };
+                      newMessages.push(processingMessage);
+                      currentModelMessageIndexRef.current = newMessages.length - 1;
+                    }
+                    return newMessages;
+                  });
                   break;
 
                 case "model_response":
-                  newMessage.text = event.response || "";
+                  setMessages((prev) => {
+                    const newMessages = [...prev];
+                    const index = currentModelMessageIndexRef.current;
+                    if (index >= 0 && index < newMessages.length) {
+                      newMessages[index] = {
+                        ...newMessages[index],
+                        text: event.response || "",
+                        model: currentModel,
+                      };
+                    } else {
+                      const responseMessage: IMessage = {
+                        sender: "assistant",
+                        text: event.response || "",
+                        timestamp: new Date(),
+                        model: currentModel,
+                      };
+                      newMessages.push(responseMessage);
+                      currentModelMessageIndexRef.current = newMessages.length - 1;
+                    }
+                    return newMessages;
+                  });
                   break;
 
                 case "redirect":
-                  newMessage.text = `Перенаправление с ${event.from_model} на ${event.to_model}`;
-                  newMessage.model = event.to_model;
+                  const redirectMessage: IMessage = {
+                    sender: "assistant",
+                    text: event.message || `Перенаправление с ${event.from_model} на ${event.to_model}`,
+                    timestamp: new Date(),
+                    model: event.to_model,
+                  };
+                  setMessages((prev) => {
+                    const newMessages = [...prev, redirectMessage];
+                    currentModelMessageIndexRef.current = newMessages.length - 1;
+                    return newMessages;
+                  });
                   break;
 
                 case "final":
-                  newMessage.text = event.response || event.message || "";
+                  setMessages((prev) => {
+                    const newMessages = [...prev];
+                    const index = currentModelMessageIndexRef.current;
+                    if (index >= 0 && index < newMessages.length) {
+                      newMessages[index] = {
+                        ...newMessages[index],
+                        text: event.response || event.message || "",
+                        model: currentModel,
+                      };
+                    } else {
+                      const finalMessage: IMessage = {
+                        sender: "assistant",
+                        text: event.response || event.message || "",
+                        timestamp: new Date(),
+                        model: currentModel,
+                      };
+                      newMessages.push(finalMessage);
+                    }
+                    return newMessages;
+                  });
                   break;
 
                 case "error":
-                  newMessage.text = event.message || "Произошла ошибка";
+                  setMessages((prev) => {
+                    const newMessages = [...prev];
+                    const index = currentModelMessageIndexRef.current;
+                    if (index >= 0 && index < newMessages.length) {
+                      newMessages[index] = {
+                        ...newMessages[index],
+                        text: event.message || "Произошла ошибка",
+                        model: currentModel,
+                      };
+                    } else {
+                      const errorMessage: IMessage = {
+                        sender: "assistant",
+                        text: event.message || "Произошла ошибка",
+                        timestamp: new Date(),
+                        model: currentModel,
+                      };
+                      newMessages.push(errorMessage);
+                    }
+                    return newMessages;
+                  });
                   break;
 
                 case "timeout":
-                  newMessage.text = event.message || "Превышено время ожидания";
+                  setMessages((prev) => {
+                    const newMessages = [...prev];
+                    const index = currentModelMessageIndexRef.current;
+                    if (index >= 0 && index < newMessages.length) {
+                      newMessages[index] = {
+                        ...newMessages[index],
+                        text: event.message || "Превышено время ожидания",
+                        model: currentModel,
+                      };
+                    } else {
+                      const timeoutMessage: IMessage = {
+                        sender: "assistant",
+                        text: event.message || "Превышено время ожидания",
+                        timestamp: new Date(),
+                        model: currentModel,
+                      };
+                      newMessages.push(timeoutMessage);
+                    }
+                    return newMessages;
+                  });
                   break;
 
                 default:
-                  newMessage.text = event.message || "";
+                  const defaultMessage: IMessage = {
+                    sender: "assistant",
+                    text: event.message || "",
+                    timestamp: new Date(),
+                    model: currentModel,
+                  };
+                  setMessages((prev) => [...prev, defaultMessage]);
               }
 
               setTimeout(() => scrollToTheEnd(), 0);
-              setMessages((prev) => [...prev, newMessage]);
             },
             (error) => {
               console.error("Stream error:", error);
@@ -374,16 +489,6 @@ const Chat = () => {
                 ))}
               </select>
             )}
-            {/* для разработки */}
-            {/* {models?.models && (
-              <select onChange={startingModelChange}>
-                {Object.values(models.models).map((el, idx) => (
-                  <option key={idx} value={el.name}>
-                    {el.name}
-                  </option>
-                ))}
-              </select>
-            )} */}
             <TextSwitch value={defaultRequest} setValue={setDefaultRequest}>
               <Paragraph text={{ size: "text-md" }}>Обычный запрос</Paragraph>
             </TextSwitch>

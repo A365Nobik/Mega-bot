@@ -1,2 +1,3 @@
-export type Models = "Gemeni" | "DeepSeek" | "GigaChat";
+export type Models = "DeepSeek" | "YandexGPT" | "GigaChat";
+
 

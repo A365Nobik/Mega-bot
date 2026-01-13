@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 from typing import AsyncGenerator, Dict, Optional
 from uuid import uuid4
-from app.services.ai_models import DeepSeekModel, GeminiModel, GigaChatModel
+from app.services.ai_models import YandexModel, DeepSeekModel, GigaChatModel
 from app.services import SessionService
 from app.models.chat import (
     ChatResponse,
@@ -18,8 +18,8 @@ from app.core.config import settings
 class ChatService:
     def __init__(self, session_service: SessionService = None):
         self.models = {
-            "Gemini": GeminiModel(),
             "DeepSeek": DeepSeekModel(),
+            "YandexGPT": YandexModel(),
             "GigaChat": GigaChatModel(),
         }
         self.session_service = session_service or SessionService()
@@ -37,7 +37,7 @@ class ChatService:
         self,
         message: str,
         session_id: Optional[str] = None,
-        starting_model: str = "Gemini",
+        starting_model: str = "DeepSeek",
     ) -> ChatResponse:
         if not session_id:
             session_id = str(uuid4())
@@ -118,7 +118,7 @@ class ChatService:
             )
 
     async def process_message_stream(
-        self, message: str, session_id: str, starting_model: str = "Gemini"
+        self, message: str, session_id: str, starting_model: str = "DeepSeek"
     ) -> AsyncGenerator[StreamEvent, None]:
         session = await self.session_service.get_or_create_session(session_id)
 
@@ -138,6 +138,8 @@ class ChatService:
 
         current_model = resolved
         iterations = 0
+        tried_models = set()
+        failed_models = set()
 
         try:
             while iterations < settings.MAX_ITERATIONS:
@@ -149,16 +151,31 @@ class ChatService:
                     iteration=iterations,
                 )
 
+                tried_models.add(current_model)
+
                 prompt = self._create_system_prompt(current_model, message, session_id)
                 raw_response = await self.models[current_model].send_request(prompt)
                 parsed_response = self._parse_model_response(raw_response)
 
                 if not parsed_response:
+                    failed_models.add(current_model)
                     yield StreamEvent(
                         type=StreamEventType.ERROR,
                         message=f"Ошибка обработки ответа от {current_model}",
                     )
-                    return
+                    available_models = [
+                        name
+                        for name in self.models.keys()
+                        if name not in failed_models
+                    ]
+                    if not available_models:
+                        yield StreamEvent(
+                            type=StreamEventType.ERROR,
+                            message="Все модели недоступны",
+                        )
+                        return
+                    current_model = available_models[0]
+                    continue
 
                 conversation_entry = ConversationEntry(
                     model=current_model,
@@ -176,19 +193,64 @@ class ChatService:
                     and "временно недоступен" in parsed_response.body
                 )
 
-                if not is_error_response:
+                if is_error_response:
+                    failed_models.add(current_model)
                     yield StreamEvent(
-                        type=StreamEventType.MODEL_RESPONSE,
+                        type=StreamEventType.ERROR,
                         model=current_model,
-                        response=parsed_response.body,
-                        response_type=parsed_response.response_type,
+                        message=parsed_response.body,
                     )
+                    if parsed_response.response_type == ResponseType.REQUEST_TO_MODEL:
+                        resolved_target = self._resolve_model_name(
+                            parsed_response.target_model
+                        )
+                        if (
+                            resolved_target
+                            and resolved_target != current_model
+                            and resolved_target not in failed_models
+                        ):
+                            yield StreamEvent(
+                                type=StreamEventType.REDIRECT,
+                                from_model=current_model,
+                                to_model=resolved_target,
+                            )
+                            current_model = resolved_target
+                            continue
+                    available_models = [
+                        name
+                        for name in self.models.keys()
+                        if name not in failed_models
+                    ]
+                    if available_models:
+                        next_model = available_models[0]
+                        yield StreamEvent(
+                            type=StreamEventType.REDIRECT,
+                            from_model=current_model,
+                            to_model=next_model,
+                            message=f"Модель {current_model} недоступна, переключаюсь на {next_model}",
+                        )
+                        current_model = next_model
+                        continue
+                    yield StreamEvent(
+                        type=StreamEventType.FINAL,
+                        model=current_model,
+                        response=f"Все модели недоступны. Последняя ошибка: {parsed_response.body}",
+                    )
+                    return
+
+                yield StreamEvent(
+                    type=StreamEventType.MODEL_RESPONSE,
+                    model=current_model,
+                    response=parsed_response.body,
+                    response_type=parsed_response.response_type,
+                )
 
                 if parsed_response.response_type == ResponseType.FINAL_ANSWER:
                     session = await self.session_service.get_session(session_id)
 
                     yield StreamEvent(
                         type=StreamEventType.FINAL,
+                        model=current_model,
                         response=parsed_response.body,
                         history=session.conversation_history,
                     )
@@ -197,6 +259,7 @@ class ChatService:
                 elif parsed_response.response_type == ResponseType.USER_QUESTION:
                     yield StreamEvent(
                         type=StreamEventType.FINAL,
+                        model=current_model,
                         response=f"Дополнительный вопрос от {current_model}: {parsed_response.body}",
                     )
                     return

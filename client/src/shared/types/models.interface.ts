@@ -65,3 +65,4 @@ const ModelsCard = memo(({ models }: ModelsCardProps) => {
 
 ModelsCard.displayName = "ModelsCard";
 export default ModelsCard;
+

@@ -19,7 +19,7 @@ async def chat_endpoint(
         result = await chat_service.process_message(
             message=message_request.message,
             session_id=message_request.session_id,
-            starting_model=message_request.starting_model or "Gemini",
+            starting_model=message_request.starting_model or "DeepSeek",
         )
         return result
     except Exception as e:
@@ -33,10 +33,10 @@ async def chat_endpoint(
 async def chat_stream_endpoint(
     prompt: str,
     session_id: Optional[str] = None,
-    starting_model: str = "Gemini",
+    starting_model: str = "DeepSeek",
     chat_service: ChatService = Depends(get_chat_service),
 ):
-    valid_models = ["Gemini", "DeepSeek", "GigaChat"]
+    valid_models = ["DeepSeek", "YandexGPT", "GigaChat"]
     if starting_model not in valid_models:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -75,10 +75,10 @@ async def chat_stream_endpoint(
 async def chat_stream_with_session_endpoint(
     session_id: str,
     prompt: str,
-    starting_model: str = "Gemini",
+    starting_model: str = "DeepSeek",
     chat_service: ChatService = Depends(get_chat_service),
 ):
-    valid_models = ["Gemini", "DeepSeek", "GigaChat"]
+    valid_models = ["DeepSeek", "YandexGPT", "GigaChat"]
     if starting_model not in valid_models:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
