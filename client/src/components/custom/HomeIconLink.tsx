@@ -1,5 +1,6 @@
 import MainIcon from "@/assets/svg/MainIcon";
 import Link from "next/link";
+import { memo } from "react";
 
 interface IProps {
   divClass?: string;
@@ -8,7 +9,7 @@ interface IProps {
   h?: number;
 }
 
-const HomeIconLink = ({ divClass, iconClass, w = 32, h = 32 }: IProps) => {
+const HomeIconLink = memo(({ divClass, iconClass, w = 32, h = 32 }: IProps) => {
   return (
     <div
       className={`transition-all delay-100 duration-150 hover:-translate-y-1 text-[var(--text-primary)] hover:text-[var(--icon-hover-primary)] ${divClass}`}
@@ -18,6 +19,7 @@ const HomeIconLink = ({ divClass, iconClass, w = 32, h = 32 }: IProps) => {
       </Link>
     </div>
   );
-};
+});
 
+HomeIconLink.displayName = "HomeIconLink";
 export default HomeIconLink;

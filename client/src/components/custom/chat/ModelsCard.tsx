@@ -21,7 +21,7 @@ const ModelsCard = memo(({ models }: ModelsCardProps) => {
 
   const modelsMap = models.models ?? {};
   const activeModels = Object.values(modelsMap).filter(
-    (model) => model?.status === "active"
+    (model) => model?.status === "active",
   );
 
   if (activeModels.length === 0) {

@@ -1,6 +1,6 @@
 "use client";
 import { createPortal } from "react-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Heading, Button, Paragraph } from "../custom";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
   closeText: string;
 }
 
-const ModalConfirm = (props: Props) => {
+const ModalConfirm = memo((props: Props) => {
   const [opacity, setOpacity] = useState<string>("opacity-0");
 
   useEffect(() => {
@@ -63,9 +63,8 @@ const ModalConfirm = (props: Props) => {
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
-};
-
+});
+ModalConfirm.displayName = "ModalConfirm";
 export default ModalConfirm;
-

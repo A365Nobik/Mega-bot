@@ -53,10 +53,10 @@ const Message = memo(({ message }: IProps) => {
         <Paragraph>{message.text}</Paragraph>
         <Button
           text={{ size: "text-sm" }}
-          className="opacity-0 scale-0 duration-300 delay-75"
+          className="opacity-0 scale-0 duration-300 delay-75 -rotate-90"
           defaultActive={false}
           defaultHover={false}
-          hover="group-hover:opacity-100 group-hover:scale-100"
+          hover="group-hover:opacity-100 group-hover:scale-100 group-hover:rotate-0"
           active="active:scale-80"
           onClick={copyMessage}
         >

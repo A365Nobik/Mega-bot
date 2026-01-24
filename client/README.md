@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend клиент для Mega-bot
 
-## Getting Started
+Современный веб-интерфейс для многомодельного чата, построенный на Next.js с TypeScript. Обеспечивает интуитивное взаимодействие пользователя с системой коллективной работы AI моделей.
 
-First, run the development server:
+## Концепция
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Frontend предоставляет полнофункциональный веб-интерфейс для взаимодействия с системой многомодельного чата:
+
+- **Интерактивный чат** - Реальное время общения с AI моделями через стриминг
+- **Управление сессиями** - Локальное сохранение истории чатов с уникальными ID  
+- **Динамическая маршрутизация** - URL-адреса для каждой сессии чата
+
+## Как это работает
+
+1. **Пользователь открывает приложение** - загружается главная страница с приветствием
+2. **Выбор стартовой модели** - пользователь может выбрать YandexGPT, DeepSeek или GigaChat как начальную модель
+3. **Отправка сообщения** - поддержка обычных запросов или многомодельного совещания
+4. **Стриминг ответов** - в режиме совещания ответы приходят в реальном времени через SSE
+5. **Сохранение истории** - чаты автоматически сохраняются в localStorage с возможностью продолжения
+
+## Преимущества интерфейса
+
+### Производительность
+
+- **Next.js 15 с Turbopack** - Быстрая сборка и hot reload
+- **Автоматическая оптимизация** - Сжатие шрифтов и изображений
+
+### Удобство использования
+
+- Автоматически расширяющееся текстовое поле
+- Система уведомлений об ошибках с автозакрытием
+- Плавные анимации и переходы с Framer Motion
+- Адаптивная типография с кастомным шрифтом Mako
+
+### Современность
+
+- TypeScript для надежности кода
+- App Router с динамическими маршрутами
+- CSS переменные для полной тематизации
+- Server-Sent Events для стриминга
+
+## Архитектура
+
+### Frontend (Next.js + TypeScript)
+
+```
+src/
+├── app/                      # Next.js App Router
+│   ├── (home)/              # Группированная маршрутизация
+│   │   └── [[...id]]/       # Динамические роуты для сессий
+│   ├── layout.tsx           # Корневой макет с провайдерами
+│   └── globals.css          # Глобальные стили и переменные
+├── components/              # React компоненты
+│   ├── custom/              # Кастомные UI компоненты
+│   │   ├── chat/            # Компоненты чата
+│   │   └── ...              # Кнопки, поля, заголовки
+│   ├── modal/               # Модальные окна
+│   └── navigation/          # Навигационные компоненты
+├── provider/                # React Context провайдеры
+├── api/                     # API слой с Axios
+├── shared/                  # Общие ресурсы
+│   ├── types/               # TypeScript интерфейсы
+│   ├── hooks/               # Кастомные хуки
+│   └── constants/           # Константы приложения
+└── assets/                  # Статические ресурсы (SVG, шрифты)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Установка и запуск
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Frontend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd client
 
-## Learn More
+# Установка зависимостей
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+# Создание файла окружения
+echo "NEXT_PUBLIC_BASE_API_URL=http://localhost:8000" > .env.local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Запуск в режиме разработки
+npm run dev
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Сборка для продакшена
+npm run build
+npm start
+```
 
-## Deploy on Vercel
+### Приложение будет доступно по адресу
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Development:** http://localhost:3000
+- **Новый чат:** http://localhost:3000
+- **Конкретная сессия:** http://localhost:3000/[session-id]

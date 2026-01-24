@@ -1,7 +1,7 @@
 {
   "name": "next-client",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
@@ -12,9 +12,10 @@
     "@deemlol/next-icons": "^0.1.9",
     "axios": "^1.12.2",
     "framer-motion": "^12.23.22",
-    "next": "15.5.4",
+    "next": "^15.5.9",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -1,6 +1,6 @@
 import type { Timestamp } from "@/shared/types";
 
-export const dateFormatter = (timestamp: Date | Timestamp | string): string => {
+export const dateFormatter = (timestamp: Timestamp): string => {
   if (!timestamp) return "Ошибка даты";
   
   let date: Date;
@@ -10,7 +10,7 @@ export const dateFormatter = (timestamp: Date | Timestamp | string): string => {
   } else if (typeof timestamp === "string") {
     date = new Date(timestamp);
   } else {
-    date = new Date(timestamp as any);
+    date = new Date(timestamp as Timestamp);
   }
   
   if (isNaN(date.getTime())) {

@@ -1,14 +1,27 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUp } from "@deemlol/next-icons";
-import { Heading, Paragraph, TextArea, Button, TextSwitch } from "..";
+import { ArrowUp, X } from "@deemlol/next-icons";
+import {
+  Heading,
+  Paragraph,
+  TextArea,
+  Button,
+  TextSwitch,
+  MainIconBlock,
+} from "..";
+import MainIcon from "@/assets/svg/MainIcon";
 import { getWelcomeMessages } from "@/shared/constants/";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ModelsCard, Message } from "@/components/custom/chat";
+import { ModelsCard, Message, LoadingDots } from "@/components/custom/chat";
 import type { ChangeEvent, KeyboardEvent } from "react";
 import type { IMessage, Models } from "@/shared/types/chat";
 import type { IModels } from "@/shared/types/models.interface";
-import { sendSingleMessage, getModels, sendSteamMessage } from "@/api";
+import {
+  sendSingleMessage,
+  getModels,
+  sendSteamMessage,
+  streamEvent,
+} from "@/api";
 import { v4 as uuidv4 } from "uuid";
 import { useParams } from "next/navigation";
 import { useChatHistory } from "@/provider/HistoryProvider";
@@ -29,6 +42,8 @@ const Chat = () => {
   const [hasContent, setHacContent] = useState<boolean>(false);
   const [defaultRequest, setDefaultRequest] = useState<boolean>(false);
   const [sessionId, setSessionId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errors, setErrors] = useState<string[]>([]);
   const currentModelMessageIndexRef = useRef<number>(-1);
   const params = useParams();
   const { refreshHistory } = useChatHistory();
@@ -48,7 +63,6 @@ const Chat = () => {
 
   useEffect(() => {
     if (typeof window === "undefined" || !sessionId) return;
-
     let historyKey: string | null = null;
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -64,8 +78,9 @@ const Chat = () => {
         try {
           setOneMessageSended(true);
           setMessages(JSON.parse(history));
-        } catch (e) {
-          console.error("Failed to parse history:", e);
+        } catch (error) {
+          console.error("Failed to parse history:", error);
+          setErrors((prev) => [...prev, "Не удалось загрузить историю"]);
         }
       }
     }
@@ -75,14 +90,14 @@ const Chat = () => {
     (event: ChangeEvent<HTMLTextAreaElement>) => {
       setMessage(event.target.value);
     },
-    []
+    [],
   );
 
   useEffect(() => {
     setTextAreaHeight(
       textAreaRef.current
         ? `${Math.min(textAreaRef?.current?.scrollHeight, 256)}px`
-        : "auto"
+        : "auto",
     );
   }, [hasContent, message]);
 
@@ -104,19 +119,17 @@ const Chat = () => {
         }
       } catch (error) {
         console.error(error);
+        setErrors((prev) => [
+          ...prev,
+          "Не удалось загрузить модели, сервер недоступен",
+        ]);
       }
     };
     fetchModels();
   }, []);
 
   useEffect(() => {
-    if (textAreaRef.current) {
-      if (textAreaRef.current?.textLength > 0) {
-        setHacContent(true);
-      } else {
-        setHacContent(false);
-      }
-    }
+    setHacContent(message.trim().length > 0);
   }, [message]);
 
   useEffect(() => {
@@ -156,6 +169,28 @@ const Chat = () => {
     }
   }, [messages, scrollToTheEnd]);
 
+  const clearChatAfterError = () => {
+    console.log(message);
+    const lastUserMsg = [...messages]
+      .reverse()
+      .find((msg) => msg.sender === "user");
+    const lastUserText = lastUserMsg?.text ?? "";
+
+    setMessages((prev) => {
+      const newMessages = [...prev];
+      return newMessages.slice(0, -1);
+    });
+
+    console.log(message);
+
+    setMessage(lastUserText);
+    if (textAreaRef.current) {
+      console.log(1234)
+      textAreaRef.current.textContent = message;
+      textAreaRef.current.focus();
+    }
+  };
+
   const sendMessage = async () => {
     if (startingModel && startingModel.length > 0) {
       const userMessage: IMessage = {
@@ -170,6 +205,7 @@ const Chat = () => {
       setTextAreaHeight("0px");
       setMessage("");
       setOneMessageSended(true);
+      setIsLoading(true);
 
       if (defaultRequest) {
         try {
@@ -193,206 +229,63 @@ const Chat = () => {
           scrollToTheEnd();
         } catch (error) {
           console.error(error);
+          setErrors((prev) => [
+            ...prev,
+            "Ошибка при отправке сообщения. Проверьте подключение к серверу.",
+          ]);
+          setMessages((prev) => [
+            ...prev,
+            {
+              sender: "assistant",
+              text: "Извините, произошла ошибка при обработке запроса. Пожалуйста, попробуйте еще раз.",
+              timestamp: new Date(),
+              model: startingModel,
+            },
+          ]);
+        } finally {
+          setIsLoading(false);
         }
       } else {
         currentModelMessageIndexRef.current = -1;
-        
+
         try {
           await sendSteamMessage(
             {
               prompt: message,
               starting_model: startingModel,
               session_id: sessionId,
+              setMessages: setMessages,
+              currentModelMessageIndexRef: currentModelMessageIndexRef,
+              scrollToTheEnd: scrollToTheEnd,
+              setIsLoading: setIsLoading,
             },
-            (event) => {
-              const currentModel = event.model || undefined;
-
-              switch (event.type) {
-                case "start":
-                  const startMessage: IMessage = {
-                    sender: "assistant",
-                    text:
-                      event.message ||
-                      `Начинаю обработку с модели ${currentModel}`,
-                    timestamp: new Date(),
-                    model: currentModel,
-                  };
-                  setMessages((prev) => {
-                    const newMessages = [...prev, startMessage];
-                    currentModelMessageIndexRef.current = newMessages.length - 1;
-                    return newMessages;
-                  });
-                  break;
-
-                case "processing":
-                  setMessages((prev) => {
-                    const newMessages = [...prev];
-                    const index = currentModelMessageIndexRef.current;
-                    if (index >= 0 && index < newMessages.length) {
-                      newMessages[index] = {
-                        ...newMessages[index],
-                        text: `Обработка моделью ${currentModel}...`,
-                        model: currentModel,
-                      };
-                    } else {
-                      const processingMessage: IMessage = {
-                        sender: "assistant",
-                        text: `Обработка моделью ${currentModel}...`,
-                        timestamp: new Date(),
-                        model: currentModel,
-                      };
-                      newMessages.push(processingMessage);
-                      currentModelMessageIndexRef.current = newMessages.length - 1;
-                    }
-                    return newMessages;
-                  });
-                  break;
-
-                case "model_response":
-                  setMessages((prev) => {
-                    const newMessages = [...prev];
-                    const index = currentModelMessageIndexRef.current;
-                    if (index >= 0 && index < newMessages.length) {
-                      newMessages[index] = {
-                        ...newMessages[index],
-                        text: event.response || "",
-                        model: currentModel,
-                      };
-                    } else {
-                      const responseMessage: IMessage = {
-                        sender: "assistant",
-                        text: event.response || "",
-                        timestamp: new Date(),
-                        model: currentModel,
-                      };
-                      newMessages.push(responseMessage);
-                      currentModelMessageIndexRef.current = newMessages.length - 1;
-                    }
-                    return newMessages;
-                  });
-                  break;
-
-                case "redirect":
-                  const redirectMessage: IMessage = {
-                    sender: "assistant",
-                    text: event.message || `Перенаправление с ${event.from_model} на ${event.to_model}`,
-                    timestamp: new Date(),
-                    model: event.to_model,
-                  };
-                  setMessages((prev) => {
-                    const newMessages = [...prev, redirectMessage];
-                    currentModelMessageIndexRef.current = newMessages.length - 1;
-                    return newMessages;
-                  });
-                  break;
-
-                case "final":
-                  setMessages((prev) => {
-                    const newMessages = [...prev];
-                    const index = currentModelMessageIndexRef.current;
-                    if (index >= 0 && index < newMessages.length) {
-                      newMessages[index] = {
-                        ...newMessages[index],
-                        text: event.response || event.message || "",
-                        model: currentModel,
-                      };
-                    } else {
-                      const finalMessage: IMessage = {
-                        sender: "assistant",
-                        text: event.response || event.message || "",
-                        timestamp: new Date(),
-                        model: currentModel,
-                      };
-                      newMessages.push(finalMessage);
-                    }
-                    return newMessages;
-                  });
-                  break;
-
-                case "error":
-                  setMessages((prev) => {
-                    const newMessages = [...prev];
-                    const index = currentModelMessageIndexRef.current;
-                    if (index >= 0 && index < newMessages.length) {
-                      newMessages[index] = {
-                        ...newMessages[index],
-                        text: event.message || "Произошла ошибка",
-                        model: currentModel,
-                      };
-                    } else {
-                      const errorMessage: IMessage = {
-                        sender: "assistant",
-                        text: event.message || "Произошла ошибка",
-                        timestamp: new Date(),
-                        model: currentModel,
-                      };
-                      newMessages.push(errorMessage);
-                    }
-                    return newMessages;
-                  });
-                  break;
-
-                case "timeout":
-                  setMessages((prev) => {
-                    const newMessages = [...prev];
-                    const index = currentModelMessageIndexRef.current;
-                    if (index >= 0 && index < newMessages.length) {
-                      newMessages[index] = {
-                        ...newMessages[index],
-                        text: event.message || "Превышено время ожидания",
-                        model: currentModel,
-                      };
-                    } else {
-                      const timeoutMessage: IMessage = {
-                        sender: "assistant",
-                        text: event.message || "Превышено время ожидания",
-                        timestamp: new Date(),
-                        model: currentModel,
-                      };
-                      newMessages.push(timeoutMessage);
-                    }
-                    return newMessages;
-                  });
-                  break;
-
-                default:
-                  const defaultMessage: IMessage = {
-                    sender: "assistant",
-                    text: event.message || "",
-                    timestamp: new Date(),
-                    model: currentModel,
-                  };
-                  setMessages((prev) => [...prev, defaultMessage]);
-              }
-
-              setTimeout(() => scrollToTheEnd(), 0);
-            },
+            streamEvent,
             (error) => {
               console.error("Stream error:", error);
-              setMessages((prev) => [
-                ...prev,
-                {
-                  sender: "assistant",
-                  text: `Ошибка: ${error.message}`,
-                  timestamp: new Date(),
-                },
-              ]);
-            }
+              clearChatAfterError();
+              setIsLoading(false);
+              setErrors((prev) => [...prev, "Ошибка совещания моделей"]);
+            },
           );
         } catch (error) {
           console.error(error);
+          setIsLoading(false);
+          setErrors((prev) => [
+            ...prev,
+            "Не удалось начать совещание моделей, сервер недоступен",
+          ]);
         }
       }
     }
   };
 
   const sendMessageKey = async (event: KeyboardEvent) => {
-    if (
-      hasContent &&
-      event.key === "Enter" &&
-      !event.shiftKey &&
-      models?.available.length !== 0
-    ) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      if (!hasContent || models?.available.length === 0 || isOverLength) {
+        event.preventDefault();
+        return;
+      }
+
       event.preventDefault();
       sendMessage();
     }
@@ -435,6 +328,65 @@ const Chat = () => {
               : `msg-${idx}`;
             return <Message key={messageKey} message={msg} />;
           })}
+          {isLoading && (
+            <div className="bg-(--bg-secondary) p-4 rounded-lg max-w-[80%] self-start">
+              <div className="flex items-center gap-2">
+                <MainIconBlock defaultActive={false}>
+                  <MainIcon w={20} h={20}></MainIcon>
+                </MainIconBlock>
+                <Paragraph>Обработка...</Paragraph>
+              </div>
+              <div className="flex items-end gap-2 mt-2">
+                <LoadingDots />
+              </div>
+            </div>
+          )}
+          {errors && (
+            <div className="absolute top-5 right-5 h-auto overflow-y-auto grid items-center gap-2">
+              <AnimatePresence>
+                {errors.map((error, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: 100, transition: { duration: 0.2 } }}
+                    className="grid gap-2 items-center bg-red-500/20 border border-red-500 p-2 rounded-lg"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Paragraph
+                        text={{
+                          color: "text-red-500",
+                          weight: "font-semibold",
+                        }}
+                      >
+                        {error}
+                      </Paragraph>
+
+                      <Button
+                        onClick={() =>
+                          setErrors((prev) => prev.filter((_, i) => i !== idx))
+                        }
+                      >
+                        <X />
+                      </Button>
+                    </div>
+
+                    <div className="w-full bg-white rounded-lg">
+                      <motion.div
+                        initial={{ width: "0%" }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 3, ease: "linear" }}
+                        onAnimationComplete={() => {
+                          setErrors((prev) => prev.filter((_, i) => i !== idx));
+                        }}
+                        className="h-2 bg-(--border-color-active) rounded-lg"
+                      />
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       )}
       <div
@@ -476,7 +428,7 @@ const Chat = () => {
             />
           </motion.div>
           <div className="flex justify-end items-center gap-2 shrink-0">
-            {models?.available?.length !== 0 && (
+            {models && models?.available?.length !== 0 ? (
               <select
                 title="Начальная модель"
                 className="text-(--text-primary) text-lg transition-colors hover:bg-(--bg-primary) p-1 rounded-lg duration-200"
@@ -488,10 +440,14 @@ const Chat = () => {
                   </option>
                 ))}
               </select>
+            ) : (
+              <Paragraph>Нет доступных моделей</Paragraph>
             )}
-            <TextSwitch value={defaultRequest} setValue={setDefaultRequest}>
-              <Paragraph text={{ size: "text-md" }}>Обычный запрос</Paragraph>
-            </TextSwitch>
+            {models && models?.available?.length !== 0 && (
+              <TextSwitch value={defaultRequest} setValue={setDefaultRequest}>
+                <Paragraph text={{ size: "text-md" }}>Обычный запрос</Paragraph>
+              </TextSwitch>
+            )}
             <div
               className={`text-xl ${
                 isOverLength
@@ -514,6 +470,8 @@ const Chat = () => {
                 isOverLength ||
                 !startingModel
               }
+              defaultActive={models?.available?.length === 0}
+              defaultHover={models?.available?.length === 0}
               className="rounded-full p-1 disabled:opacity-50 disabled:cursor-no-drop bg-(--btn-primary)"
             >
               <ArrowUp color="var(--btn-primary-text)" />

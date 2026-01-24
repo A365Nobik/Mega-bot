@@ -1,26 +1,23 @@
 import type { AxiosError } from "axios";
-import {api} from "@/api/";
+import { api } from "@/api/";
 import type { ISingleResponse, ISingleRequest } from "@/shared/types/chat";
 
 const sendSingleMessage = async (
-  props: ISingleRequest
+  props: ISingleRequest,
 ): Promise<ISingleResponse> => {
   try {
-    const response = await api.post<ISingleResponse>(
-      "/chat/",
-      {
-        message: props.message.trim(),
-        session_id: props.session_id,
-        starting_model: props.starting_model,
-      }
-    );
+    const response = await api.post<ISingleResponse>("/chat/", {
+      message: props.message.trim(),
+      session_id: props.session_id,
+      starting_model: props.starting_model,
+    });
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError;
     if (axiosError.response) {
       const status = axiosError.response.status;
       const details =
-        (axiosError.response.data as any)?.details ||
+        (axiosError.response.data as { details?: string })?.details ||
         axiosError.response.statusText;
       throw new Error(`Ошибка ${status}, ${details}`);
     } else if (axiosError.request) {

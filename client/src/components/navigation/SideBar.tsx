@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, memo } from "react";
 import { Sidebar, ArrowDown, PlusCircle } from "@deemlol/next-icons";
 import { MainIconBlock, Paragraph, Heading, Button } from "@/components/custom";
 import MainIcon from "@/assets/svg/MainIcon";
@@ -11,7 +11,7 @@ import { Trash } from "@deemlol/next-icons";
 import { ModalConfirm } from "@/components/modal";
 import type { ChangeEvent } from "react";
 
-const SideBar = () => {
+const SideBar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChatsOpen, setChatsOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -75,7 +75,7 @@ const SideBar = () => {
 
   const deleteChat = (key: string) => {
     localStorage.removeItem(key);
-    router.replace("/ё");
+    router.replace("/");
     location.reload();
   };
 
@@ -178,8 +178,8 @@ const SideBar = () => {
                 type="text"
                 placeholder="Поиск по чатам..."
                 value={searchQuery}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setSearchQuery(e.target.value)
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setSearchQuery(event.target.value)
                 }
                 className="w-full p-2 rounded-lg bg-(--bg-primary)  text-(--text-primary) placeholder:text-(--text-secondary) outline-none border-1 focus:border-(--border-color-active) transition-colors"
               />
@@ -216,7 +216,7 @@ const SideBar = () => {
                         href={`/${sessionId}`}
                         className="flex-1 overflow-hidden"
                       >
-                        <Paragraph>{chatName}</Paragraph>
+                        <Paragraph>{chatName.length>20?`${chatName.slice(0, 20)}...`:`${chatName}`}</Paragraph>
                       </Link>
                       <AnimatePresence>
                         {isHovered && (
@@ -270,6 +270,6 @@ const SideBar = () => {
       )}
     </>
   );
-};
-
+});
+SideBar.displayName = "SideBar";
 export default SideBar;

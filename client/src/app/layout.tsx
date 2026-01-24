@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`bg-(--bg-primary)  antialiased font-mako`}>
+      <body className={`bg-(--bg-primary) antialiased font-mako`}>
         <Providers>{children}</Providers>
       </body>
     </html>

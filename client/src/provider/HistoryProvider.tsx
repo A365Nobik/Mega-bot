@@ -15,7 +15,7 @@ interface ChatHistoryContext {
 }
 
 const ChatHistoryContext = createContext<ChatHistoryContext | undefined>(
-  undefined
+  undefined,
 );
 
 export const ChatHistoryProvider = ({ children }: { children: ReactNode }) => {
@@ -35,7 +35,7 @@ export const ChatHistoryProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     refreshHistory();
-  }, []);
+  }, [refreshHistory]);
 
   return (
     <ChatHistoryContext.Provider value={{ history, refreshHistory }}>
@@ -48,7 +48,7 @@ export const useChatHistory = () => {
   const context = useContext(ChatHistoryContext);
   if (!context) {
     throw new Error(
-      "useChatHistory должен использоваться вместе с ChatHistoryProvider"
+      "useChatHistory должен использоваться вместе с ChatHistoryProvider",
     );
   }
   return context;

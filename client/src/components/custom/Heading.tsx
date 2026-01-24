@@ -1,10 +1,11 @@
 import type { IText } from "@/shared/types/text.interface";
+import { memo } from "react";
 
 interface Props {
   text?: IText;
   children: React.ReactNode;
 }
-const Heading = ({ text={size:"text-3xl"}, children }: Props) => {
+const Heading = memo(({ text={size:"text-3xl"}, children }: Props) => {
   return (
     <h1
       className={`font-mako ${text?.color || "text-[var(--text-primary)]"} ${
@@ -14,5 +15,6 @@ const Heading = ({ text={size:"text-3xl"}, children }: Props) => {
       {children}
     </h1>
   );
-};
+});
+Heading.displayName = "Heading";
 export default Heading;

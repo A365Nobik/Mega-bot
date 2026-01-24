@@ -1,10 +1,11 @@
+import { memo } from "react";
 import type { IText } from "@/shared/types/text.interface";
 
 interface Props {
   text?: IText;
   children: React.ReactNode;
 }
-const Paragraph = ({
+const Paragraph =memo( ({
   text = {
     size: "text-lg",
   },
@@ -19,6 +20,6 @@ const Paragraph = ({
       {children}
     </p>
   );
-};
-
+});
+Paragraph.displayName = "Paragraph";
 export default Paragraph;
