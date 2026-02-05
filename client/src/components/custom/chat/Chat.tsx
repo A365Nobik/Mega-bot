@@ -185,7 +185,7 @@ const Chat = () => {
 
     setMessage(lastUserText);
     if (textAreaRef.current) {
-      console.log(1234)
+      console.log(1234);
       textAreaRef.current.textContent = message;
       textAreaRef.current.focus();
     }
@@ -305,14 +305,15 @@ const Chat = () => {
   return (
     <div
       ref={chatRef}
-      className="flex h-7/8 flex-col justify-between items-center w-full overflow-y-scroll"
+      className="flex h-7/8 flex-col justify-between items-center w-full  overflow-y-scroll"
     >
       {mounted && !oneMessageSended && (
-        <div className="w-1/2 flex flex-col justify-start items-start gap-8 p-4">
+        <div className="w-1/2 max-xl:w-140 flex flex-col justify-start items-start gap-8 max-xl:gap-4 p-4">
           <Heading
             text={{
-              size: "text-6xl",
+              size: "text-6xl max-xl:text-2xl",
               className: "animate-appear-default-opacity delay-100",
+              responseSize: false,
             }}
           >
             {welcome}
@@ -394,7 +395,7 @@ const Chat = () => {
         className="w-full flex flex-col justify-end items-center"
       >
         <div
-          className={`fixed bottom-5 z-10 w-1/2 h-auto grid items-end border transition-color duration-150 rounded-xl p-2 bg-(--bg-secondary) animate-bottom-appear shrink-0 ${
+          className={`fixed bottom-5 max-xl:bottom-2 z-10 w-1/2 max-xl:w-140 h-auto grid items-end border transition-color duration-150 rounded-xl p-2 max-xl:p-1 bg-(--bg-secondary) animate-bottom-appear shrink-0 ${
             isOverLength
               ? "border-red-500"
               : "border-(--border-color) focus-within:border-(--border-color-active)"
@@ -423,15 +424,17 @@ const Chat = () => {
               onChange={handleChange}
               placeholder="Напишите что-нибудь..."
               text={{
-                className: "overflow-y-auto max-h-64",
+                className:
+                  "overflow-y-auto max-h-64 max-xl:max-h-32 px-2 max-xl:px-1",
+                size: "text-lg max-xl:text-sm",
               }}
             />
           </motion.div>
-          <div className="flex justify-end items-center gap-2 shrink-0">
+          <div className="flex justify-end items-center gap-2 max-xl:gap-1 shrink-0">
             {models && models?.available?.length !== 0 ? (
               <select
                 title="Начальная модель"
-                className="text-(--text-primary) text-lg transition-colors hover:bg-(--bg-primary) p-1 rounded-lg duration-200"
+                className="text-(--text-primary) text-lg max-xl:text-sm transition-colors hover:bg-(--bg-primary) p-1 max-xl:p-0 rounded-md duration-200"
                 onChange={startingModelChange}
               >
                 {models?.available?.map((model, idx) => (
@@ -444,18 +447,21 @@ const Chat = () => {
               <Paragraph>Нет доступных моделей</Paragraph>
             )}
             {models && models?.available?.length !== 0 && (
-              <TextSwitch value={defaultRequest} setValue={setDefaultRequest}>
-                <Paragraph text={{ size: "text-md" }}>Обычный запрос</Paragraph>
-              </TextSwitch>
+              <div className="">
+                <TextSwitch value={defaultRequest} setValue={setDefaultRequest}>
+                  <Paragraph text={{ size: "text-sm" }}>Обычный</Paragraph>
+                </TextSwitch>
+              </div>
             )}
-            <div
-              className={`text-xl ${
-                isOverLength
-                  ? "text-red-500 animate-pulse"
-                  : "text-(--text-primary)"
-              }`}
-            >
-              {message.length}/{maxLength}
+            <div>
+              <Paragraph
+                text={{
+                  size: "text-sm",
+                  className: `${isOverLength ? "text-red-500 animate-pulse" : "text-(--text-primary)"}`,
+                }}
+              >
+                {message.length}/{maxLength}
+              </Paragraph>
             </div>
             <Button
               title={
@@ -472,24 +478,12 @@ const Chat = () => {
               }
               defaultActive={models?.available?.length === 0}
               defaultHover={models?.available?.length === 0}
-              className="rounded-full p-1 disabled:opacity-50 disabled:cursor-no-drop bg-(--btn-primary)"
+              className="rounded-full p-1 max-xl:p-0.5 disabled:opacity-50 disabled:cursor-no-drop bg-(--btn-primary)"
             >
               <ArrowUp color="var(--btn-primary-text)" />
             </Button>
           </div>
         </div>
-        <AnimatePresence>
-          {isOverLength && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: -160 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="text-red-500 text-sm"
-            >
-              Превышена максимальная длина сообщения!
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   );

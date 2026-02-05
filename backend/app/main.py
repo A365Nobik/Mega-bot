@@ -4,8 +4,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1.api import api_router
 from app.services.session_service import SessionService
-
+if __name__ == "__main__":
+    import uvicorn
+    # Если запускаем из корня, где лежит папка app
+    uvicorn.run(
+        "app.main:app", # путь должен быть импортируемым
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=False  # reload ОБЯЗАТЕЛЬНО False для бинарника
+    )
 session_service = SessionService()
+
+
 
 
 @asynccontextmanager

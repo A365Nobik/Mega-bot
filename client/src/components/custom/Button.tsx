@@ -36,7 +36,7 @@ const Button = memo(
         } ${
           defaultActive ? "active:scale-90 active:duration-75" : active
         } font-mako transition-all cursor-pointer ${
-          text?.color || "text-[var(--text-primary)]"
+          text?.color || "text-(--text-primary)"
         } ${text?.size || "text-lg"} ${text?.weight || "font-medium"} ${
           bg || ""
         } ${className || ""}`}

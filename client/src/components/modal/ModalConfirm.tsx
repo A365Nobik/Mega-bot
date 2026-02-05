@@ -33,7 +33,7 @@ const ModalConfirm = memo((props: Props) => {
     <div
       className={`inset-0 z-100 fixed flex justify-center items-center bg-black/50 duration-300 transition-all ${opacity}`}
     >
-      <div className="delete-modal flex flex-col justify-around items-center w-[25%] h-[15%] bg-(--bg-primary) rounded-xl p-4">
+      <div className="delete-modal flex flex-col justify-around items-center w-[25%] h-[15%] max-xl:w-[45%] max-xl:h-[35%]  bg-(--bg-primary) rounded-xl p-4">
         <div className="flex flex-col gap-2 items-center">
           <Heading>{props.questions}</Heading>
           <Paragraph
@@ -49,13 +49,13 @@ const ModalConfirm = memo((props: Props) => {
               closeModal();
             }}
             bg="bg-red-700"
-            className="p-2 rounded-lg"
+            className="p-2 max-xl:p-1 rounded-md"
           >
             {props.actionText}
           </Button>
           <Button
             bg="bg-blue-700"
-            className="p-2 rounded-lg"
+            className="p-2 max-xl:p-1 rounded-md"
             onClick={closeModal}
           >
             {props.closeText}

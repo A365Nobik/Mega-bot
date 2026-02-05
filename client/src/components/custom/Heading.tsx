@@ -1,16 +1,26 @@
-import type { IText } from "@/shared/types/text.interface";
+import type { IText, TextDefaults } from "@/shared/types/text.interface";
 import { memo } from "react";
+
+const textDefaults: TextDefaults = {
+  size: "text-3xl",
+  responseSize: true,
+};
 
 interface Props {
   text?: IText;
   children: React.ReactNode;
 }
-const Heading = memo(({ text={size:"text-3xl"}, children }: Props) => {
+const Heading = memo(({ text, children }: Props) => {
+  const config = { ...textDefaults, ...text };
+
   return (
     <h1
-      className={`font-mako ${text?.color || "text-[var(--text-primary)]"} ${
-        text?.size
-      } ${text?.weight} ${text?.className || ""}`}
+      className={`font-mako 
+        ${config.color || "text-(--text-primary)"} 
+        ${config.size} 
+        ${config.responseSize ? "max-xl:text-lg" : ""} 
+        ${config.weight || ""} 
+        ${config.className || ""}`}
     >
       {children}
     </h1>

@@ -12,12 +12,12 @@ interface IProps {
 }
 const Message = memo(({ message }: IProps) => {
   const [sended, setSended] = useState<string>(
-    dateFormatter(message.timestamp ? message.timestamp : "Ошибка даты")
+    dateFormatter(message.timestamp ? message.timestamp : "Ошибка даты"),
   );
   useEffect(() => {
     const timer = setTimeout(() => {
       setSended(
-        dateFormatter(message.timestamp ? message.timestamp : "Ошибка даты")
+        dateFormatter(message.timestamp ? message.timestamp : "Ошибка даты"),
       );
     }, 60000);
     return () => {
@@ -33,7 +33,7 @@ const Message = memo(({ message }: IProps) => {
 
   return (
     <div
-      className={`bg-(--bg-secondary) p-4 rounded-lg max-w-[80%] ${
+      className={`bg-(--bg-secondary) p-4 max-xl:p-2 rounded-md max-w-[80%] ${
         message.sender === "user" ? "self-end" : "self-start"
       }`}
     >

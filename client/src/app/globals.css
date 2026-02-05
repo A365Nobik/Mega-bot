@@ -16,9 +16,22 @@
   --animate-top-appear: top-appear 1s ease;
 }
 body {
-  font-family: "Mako", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  transition: background-color 0.4s ease, color 0.4s ease;
+  font-family:
+    "Mako",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
   background-color: var(--bg-primary);
 }
 
@@ -68,4 +81,35 @@ body {
   --btn-secondary-text: var(--text-primary);
   --border-color: var(--text-primary);
   --border-color-active: #4b70f5;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(120, 120, 120, 0.3);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(120, 120, 120, 0.6);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 120, 120, 0.3) transparent;
+}
+
+textarea {
+  ::-webkit-scrollbar {
+    display: none;
+  }
 }

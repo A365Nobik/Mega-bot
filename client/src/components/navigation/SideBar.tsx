@@ -91,7 +91,7 @@ const SideBar = memo(() => {
           <div className="flex flex-col justify-center items-center gap-2 mb-auto w-full">
             <div className="flex items-center justify-between w-full">
               <motion.span
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${isOpen ? null : "max-xl:-translate-x-[15px]"}`}
                 initial={{ x: -120 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 animate={{ x: isOpen ? 5 : -120 }}
@@ -105,6 +105,7 @@ const SideBar = memo(() => {
                 initial={{ x: -100 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 animate={{ x: isOpen ? -5 : -100 }}
+                className={` ${isOpen ? null : "max-xl:-translate-x-[15px]"}`}
               >
                 <MainIconBlock onClick={openSideBar}>
                   <Sidebar size={32} />
@@ -117,7 +118,7 @@ const SideBar = memo(() => {
               className="flex justify-center items-center w-full p-1 rounded-lg gap-2"
             >
               <a href={"/"}>
-                <PlusCircle size={24} />
+                <PlusCircle size={!isOpen ? 32 : 22} />
               </a>
               <AnimatePresence>
                 {isOpen && (
@@ -139,30 +140,34 @@ const SideBar = memo(() => {
             initial={{ opacity: 0 }}
             animate={{ opacity: isOpen ? 100 : 0 }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
-            className={`w-full flex flex-col items-start overflow-auto flex-1 gap-2 rounded-xl `}
+            className={`w-full flex flex-col items-start overflow-auto flex-1 gap-2 rounded-md `}
           >
             <div className="w-full group flex justify-between items-center ">
-              <span
-                onClick={openChats}
-                className="flex items-center w-max cursor-pointer"
-              >
-                <Paragraph>Чаты</Paragraph>
-                {history && history.length > 0 && (
-                  <MainIconBlock
-                    className={`scale-0 transition-transform duration-250 ${
-                      !isChatsOpen ? "rotate-180" : ""
-                    } group-hover:scale-100`}
-                  >
-                    <ArrowDown size={20} />
-                  </MainIconBlock>
-                )}
-              </span>
+              <div className="flex items-center w-full cursor-pointer">
+                <Button
+                  defaultActive={false}
+                  defaultHover={false}
+                  onClick={openChats}
+                  className="flex items-center gap-1"
+                >
+                  <Paragraph>Чаты</Paragraph>
+                  {history && history.length > 0 && (
+                    <MainIconBlock
+                      className={`scale-0 transition-transform duration-250 ${
+                        !isChatsOpen ? "rotate-180" : ""
+                      } group-hover:scale-100`}
+                    >
+                      <ArrowDown size={20} />
+                    </MainIconBlock>
+                  )}
+                </Button>
+              </div>
               {history && history.length > 0 && (
                 <Button
                   title="Удалить все чаты"
                   defaultHover={false}
                   onClick={() => setDeleteModal(true)}
-                  className="bg-red-700 p-1 rounded-lg"
+                  className="bg-red-700 p-1 rounded-md"
                 >
                   <MainIconBlock>
                     <Trash size={18} />
@@ -181,7 +186,7 @@ const SideBar = memo(() => {
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   setSearchQuery(event.target.value)
                 }
-                className="w-full p-2 rounded-lg bg-(--bg-primary)  text-(--text-primary) placeholder:text-(--text-secondary) outline-none border-1 focus:border-(--border-color-active) transition-colors"
+                className="w-full p-2 max-xl:p-1 rounded-md bg-(--bg-primary)  text-(--text-primary) placeholder:text-(--text-secondary) outline-none border focus:border-(--border-color-active) transition-colors"
               />
             )}
             {filteredHistory && filteredHistory.length > 0 ? (
@@ -208,7 +213,7 @@ const SideBar = memo(() => {
                       onMouseLeave={() => setHoveredChatKey(null)}
                       className={`group relative flex items-center justify-between text-(--text-primary) w-full rounded-lg p-2 transition-all ${
                         isActive
-                          ? "bg-(--bg-secondary) border-1 border-(--border-color-active)"
+                          ? "bg-(--bg-secondary) border border-(--border-color-active)"
                           : "hover:bg-(--bg-secondary)"
                       }`}
                     >
@@ -216,7 +221,11 @@ const SideBar = memo(() => {
                         href={`/${sessionId}`}
                         className="flex-1 overflow-hidden"
                       >
-                        <Paragraph>{chatName.length>20?`${chatName.slice(0, 20)}...`:`${chatName}`}</Paragraph>
+                        <Paragraph>
+                          {chatName.length > 20
+                            ? `${chatName.slice(0, 20)}...`
+                            : `${chatName}`}
+                        </Paragraph>
                       </Link>
                       <AnimatePresence>
                         {isHovered && (
@@ -232,7 +241,7 @@ const SideBar = memo(() => {
                               onClick={() => {
                                 deleteChat(el);
                               }}
-                              className="bg-red-700 hover:bg-red-600 p-1 rounded-lg ml-2"
+                              className="bg-red-700 hover:bg-red-600 p-1 rounded-md"
                             >
                               <MainIconBlock>
                                 <Trash size={16} />
@@ -250,8 +259,10 @@ const SideBar = memo(() => {
                 <Paragraph>Чаты не найдены</Paragraph>
               </div>
             ) : (
-              <div className="bg-(--bg-primary) p-2 rounded-xl">
-                <Heading>У вас пока нет чатов</Heading>
+              <div className="w-full bg-(--bg-primary) p-2 rounded-md">
+                <Paragraph text={{ className: "text-center" }}>
+                  У вас пока нет чатов
+                </Paragraph>
               </div>
             )}
           </motion.div>

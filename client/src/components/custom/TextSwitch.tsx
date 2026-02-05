@@ -9,11 +9,11 @@ interface Props {
 const TextSwitch = memo(({ ...props }: Props) => {
   return (
     <div
-      className={` flex items-center transition-colors duration-350 ${
+      className={`flex items-center transition-colors duration-350 ${
         props.value ? "bg-(--border-color-active)" : "bg-transparent"
       } rounded-lg p-1`}
     >
-      <button  onClick={() => props.setValue(!props.value)}>
+      <button onClick={() => props.setValue(!props.value)}>
         {props.children}
       </button>
     </div>

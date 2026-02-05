@@ -6,8 +6,8 @@ from app.models.chat import ResponseType
 
 
 class GigaChatModel(BaseAIModel):
-    def __init__(self):
-        super().__init__(
+    def init(self):
+        super().init(
             name="GigaChat",
             api_url=settings.GIGACHAT_API_URL,
             api_key=settings.GIGACHAT_API_KEY,
@@ -53,6 +53,11 @@ class GigaChatModel(BaseAIModel):
     async def send_request(self, prompt: str) -> str:
         start_time = time.time()
 
+        system_instr = (
+            "Ты — участник консилиума ИИ. Твой ответ ОБЯЗАТЕЛЬНО должен быть "
+        "валидным JSON объектом. Не пиши лишнего текста до или после JSON."
+    )
+
         try:
             if not self.api_key:
                 self._status = "error"
@@ -68,11 +73,11 @@ class GigaChatModel(BaseAIModel):
                 messages=[
                     self._Messages(
                         role=self._MessagesRole.SYSTEM,
-                        content="Ты GigaChat - AI ассистент.",
+                        content=system_instr,
                     ),
                     self._Messages(role=self._MessagesRole.USER, content=prompt),
                 ],
-                temperature=0.7,
+                temperature=0.2,
                 max_tokens=2000,
             )
 

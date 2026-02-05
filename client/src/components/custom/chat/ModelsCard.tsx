@@ -11,10 +11,15 @@ interface ModelsCardProps {
 const ModelsCard = memo(({ models }: ModelsCardProps) => {
   if (!models) {
     return (
-      <div className="flex justify-center items-center bg-(--bg-secondary) p-4 rounded-xl animate-pulse">
-        <Heading text={{ size: "text-3xl", weight: "font-bold" }}>
+      <div className="flex justify-center items-center bg-(--bg-secondary) p-4 max-xl:p-2 rounded-md animate-pulse ">
+        <Paragraph
+          text={{
+            size: "text-3xl ",
+            weight: "font-bold max-xl:font-normal",
+          }}
+        >
           Модели загружаются...
-        </Heading>
+        </Paragraph>
       </div>
     );
   }
@@ -44,12 +49,14 @@ const ModelsCard = memo(({ models }: ModelsCardProps) => {
         {activeModels.map((model, index) => (
           <div
             key={`${model.name}-${index}`}
-            className="bg-(--bg-secondary) rounded-xl space-y-2 p-4 hover:opacity-90 transition-all animate-top-appear"
+            className="h-full bg-(--bg-secondary) rounded-xl space-y-2 p-4 max-xl:p-2 hover:opacity-90 transition-all animate-top-appear"
             style={{ animationDelay: `${index * 120}ms` }}
           >
-            <Heading>{model.name}</Heading>
+            <Paragraph>{model.name}</Paragraph>
             <hr className="text-(--text-primary)" />
-            <Paragraph>{model.specialization}</Paragraph>
+            <Paragraph text={{ responseSize: false, size: "text-[16px]" }}>
+              {model.specialization}
+            </Paragraph>
           </div>
         ))}
       </div>
