@@ -14,7 +14,7 @@ const ModelsCard = memo(({ models }: ModelsCardProps) => {
       <div className="flex justify-center items-center bg-(--bg-secondary) p-4 max-xl:p-2 rounded-md animate-pulse ">
         <Paragraph
           text={{
-            size: "text-3xl ",
+            size: "text-3xl",
             weight: "font-bold max-xl:font-normal",
           }}
         >
@@ -52,9 +52,11 @@ const ModelsCard = memo(({ models }: ModelsCardProps) => {
             className="h-full bg-(--bg-secondary) rounded-xl space-y-2 p-4 max-xl:p-2 hover:opacity-90 transition-all animate-top-appear"
             style={{ animationDelay: `${index * 120}ms` }}
           >
-            <Paragraph>{model.name}</Paragraph>
+            <Paragraph text={{ size: "text-2xl" }}>{model.name}</Paragraph>
             <hr className="text-(--text-primary)" />
-            <Paragraph text={{ responseSize: false, size: "text-[16px]" }}>
+            <Paragraph
+              text={{ responseSize: false, size: "text-lg max-xl:text-[16px]" }}
+            >
               {model.specialization}
             </Paragraph>
           </div>

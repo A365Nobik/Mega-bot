@@ -6,8 +6,8 @@ from app.models.chat import ResponseType
 
 
 class GigaChatModel(BaseAIModel):
-    def init(self):
-        super().init(
+    def __init__(self):
+        super().__init__(
             name="GigaChat",
             api_url=settings.GIGACHAT_API_URL,
             api_key=settings.GIGACHAT_API_KEY,

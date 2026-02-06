@@ -43,13 +43,7 @@ const SideBar = memo(() => {
   }, [history, searchQuery]);
 
   const deleteChats = () => {
-    const themeVal = localStorage.getItem("theme");
     localStorage.clear();
-    if (themeVal) {
-      localStorage.setItem("theme", themeVal);
-    } else {
-      localStorage.setItem("theme", "system");
-    }
     refreshHistory();
     router.replace("/");
     location.reload();
@@ -107,9 +101,15 @@ const SideBar = memo(() => {
                 animate={{ x: isOpen ? -5 : -100 }}
                 className={` ${isOpen ? null : "max-xl:-translate-x-[15px]"}`}
               >
-                <MainIconBlock onClick={openSideBar}>
-                  <Sidebar size={32} />
-                </MainIconBlock>
+                <Button
+                  defaultActive={false}
+                  defaultHover={false}
+                  onClick={openSideBar}
+                >
+                  <MainIconBlock>
+                    <Sidebar size={32} />
+                  </MainIconBlock>
+                </Button>
               </motion.span>
             </div>
             <Button

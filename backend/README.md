@@ -88,9 +88,21 @@ app/ # Основная логика приложения
 
 ### Backend
 
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```cd backend```
+##### Создадим виртуальное окружение:
+- ```python -m venv venv```
+
+##### Активируем виртуальное окружение:
+
+##### Для Linux/macOS:
+- ```source venv/bin/activate```
+
+##### Для Windows:
+- ```venv/Scripts/activate```
+
+#### Далее 
+- ```pip install -r requirements.txt```(зависимости)
+- ```uvicorn app.main:app --reload --host 0.0.0.0 --port 8000```(запуск)
 
 ### API документация
 

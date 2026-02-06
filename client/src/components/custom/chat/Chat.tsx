@@ -401,17 +401,9 @@ const Chat = () => {
               : "border-(--border-color) focus-within:border-(--border-color-active)"
           }`}
         >
-          <motion.div
-            initial={{ height: "auto" }}
-            animate={{
-              height: hasContent ? textAreaHeight : "auto",
-            }}
-            transition={{
-              delay: 0,
-              duration: 0.2,
-              ease: "easeInOut",
-            }}
-            className="flex-1"
+          <div
+            style={{ height: hasContent ? textAreaHeight : "auto" }}
+            className="flex-1 transition-[height] duration-200 ease-in-out overflow-hidden"
           >
             <TextArea
               onKeyDown={sendMessageKey}
@@ -425,11 +417,11 @@ const Chat = () => {
               placeholder="Напишите что-нибудь..."
               text={{
                 className:
-                  "overflow-y-auto max-h-64 max-xl:max-h-32 px-2 max-xl:px-1",
+                  "overflow-y-auto max-h-64 max-xl:max-h-32 block px-1",
                 size: "text-lg max-xl:text-sm",
               }}
             />
-          </motion.div>
+          </div>
           <div className="flex justify-end items-center gap-2 max-xl:gap-1 shrink-0">
             {models && models?.available?.length !== 0 ? (
               <select
@@ -447,16 +439,16 @@ const Chat = () => {
               <Paragraph>Нет доступных моделей</Paragraph>
             )}
             {models && models?.available?.length !== 0 && (
-              <div className="">
+              <div>
                 <TextSwitch value={defaultRequest} setValue={setDefaultRequest}>
-                  <Paragraph text={{ size: "text-sm" }}>Обычный</Paragraph>
+                  <Paragraph text={{ size: "text-lg" }}>Обычный</Paragraph>
                 </TextSwitch>
               </div>
             )}
             <div>
               <Paragraph
                 text={{
-                  size: "text-sm",
+                  size: "text-lg",
                   className: `${isOverLength ? "text-red-500 animate-pulse" : "text-(--text-primary)"}`,
                 }}
               >
