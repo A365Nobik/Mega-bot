@@ -6,6 +6,6 @@ const welcomeMessages: string[] = [
   "Добро пожаловать! Чем могу помочь?  ",
 ];
 export const getWelcomeMessages = (): string => {
-  const randomIndex = Math.round(Math.random() * welcomeMessages.length);
+  const randomIndex = Math.round(Math.random() * welcomeMessages.length - 1);
   return welcomeMessages[randomIndex];
 };

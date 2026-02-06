@@ -41,21 +41,36 @@ const ModelsCard = memo(({ models }: ModelsCardProps) => {
 
   return (
     <>
-      <div className="flex justify-center items-center gap-4 animate-top-appear">
-        <Heading text={{ size: "text-4xl" }}>Доступные модели:</Heading>
-      </div>
+      <Paragraph
+        text={{
+          size: "text-4xl max-2xl:text-3xl max-xl:text-xl max-md:text-md",
+          responseSize: false,
+        }}
+      >
+        Доступные модели:
+      </Paragraph>
 
-      <div className="flex justify-center items-center gap-4">
+      <div className="flex justify-center items-center gap-4 max-sm:grid max-sm:grid-cols-2 max-md:gap-2">
         {activeModels.map((model, index) => (
           <div
             key={`${model.name}-${index}`}
-            className="h-full bg-(--bg-secondary) rounded-xl space-y-2 p-4 max-xl:p-2 hover:opacity-90 transition-all animate-top-appear"
+            className="h-full bg-(--bg-secondary) rounded-xl space-y-2 p-4 max-xl:p-2 hover:opacity-90 transition-all animate-top-appear max-md:w-40"
             style={{ animationDelay: `${index * 120}ms` }}
           >
-            <Paragraph text={{ size: "text-2xl" }}>{model.name}</Paragraph>
+            <Paragraph
+              text={{
+                size: "text-2xl max-2xl:text-xl max-xl:text-md max-md:text-sm",
+                responseSize: false,
+              }}
+            >
+              {model.name}
+            </Paragraph>
             <hr className="text-(--text-primary)" />
             <Paragraph
-              text={{ responseSize: false, size: "text-lg max-xl:text-[16px]" }}
+              text={{
+                responseSize: false,
+                size: "text-lg max-xl:text-sm max-md:text-[14px]",
+              }}
             >
               {model.specialization}
             </Paragraph>

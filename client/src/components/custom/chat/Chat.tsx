@@ -50,7 +50,6 @@ const Chat = () => {
 
   useEffect(() => {
     setMounted(true);
-    setWelcome(getWelcomeMessages());
     if (typeof window !== "undefined") {
       if (!params.id) {
         setSessionId(uuidv4());
@@ -59,6 +58,7 @@ const Chat = () => {
         setSessionId(id);
       }
     }
+    setWelcome(getWelcomeMessages());
   }, [params.id]);
 
   useEffect(() => {
@@ -305,14 +305,14 @@ const Chat = () => {
   return (
     <div
       ref={chatRef}
-      className="flex h-7/8 flex-col justify-between items-center w-full  overflow-y-scroll"
+      className="flex h-7/8 flex-col justify-between items-center max-md:items-end w-full overflow-y-scroll"
     >
       {mounted && !oneMessageSended && (
-        <div className="w-1/2 max-xl:w-140 flex flex-col justify-start items-start gap-8 max-xl:gap-4 p-4">
+        <div className="w-1/2 max-xl:w-140 flex flex-col justify-start items-start  max-md:items-center gap-8 max-xl:gap-4 p-4 max-md:w-screen max-md:mt-12">
           <Heading
             text={{
-              size: "text-6xl max-xl:text-2xl",
-              className: "animate-appear-default-opacity delay-100",
+              size: "text-6xl max-2xl:text-4xl max-xl:text-3xl max-md:text-2xl",
+              className: "w-auto animate-appear delay-100",
               responseSize: false,
             }}
           >
@@ -322,7 +322,7 @@ const Chat = () => {
         </div>
       )}
       {oneMessageSended && (
-        <div className="w-1/2 flex-1 flex flex-col gap-8">
+        <div className="w-1/2 flex flex-1 flex-col gap-8 max-md:gap-4 max-md:w-full max-md:px-3 max-xl:mb-10">
           {messages.map((msg, idx) => {
             const messageKey = msg.timestamp
               ? `msg-${idx}-${msg.timestamp.toLocaleString()}`
@@ -343,7 +343,7 @@ const Chat = () => {
             </div>
           )}
           {errors && (
-            <div className="absolute top-5 right-5 h-auto overflow-y-auto grid items-center gap-2">
+            <div className="absolute top-5 right-5 h-auto overflow-y-auto grid items-center gap-2 z-100 max-sm:right-0">
               <AnimatePresence>
                 {errors.map((error, idx) => (
                   <motion.div
@@ -351,12 +351,12 @@ const Chat = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: 100, transition: { duration: 0.2 } }}
-                    className="grid gap-2 items-center bg-red-500/20 border border-red-500 p-2 rounded-lg"
+                    className="grid gap-2 items-center bg-red-500/20 max-sm:bg-red-500 border border-red-500 p-2 rounded-md max-sm:p-1"
                   >
                     <div className="flex items-center gap-2">
                       <Paragraph
                         text={{
-                          color: "text-red-500",
+                          color: "text-red-500 max-sm:text-(--text-primary)",
                           weight: "font-semibold",
                         }}
                       >
@@ -395,7 +395,7 @@ const Chat = () => {
         className="w-full flex flex-col justify-end items-center"
       >
         <div
-          className={`fixed bottom-5 max-xl:bottom-2 z-10 w-1/2 max-xl:w-140 h-auto grid items-end border transition-color duration-150 rounded-xl p-2 max-xl:p-1 bg-(--bg-secondary) animate-bottom-appear shrink-0 ${
+          className={`fixed bottom-5 max-2xl:bottom-2 z-10 w-1/2 max-xl:w-140 max-md:w-100 max-sm:w-90 h-auto grid items-end border transition-color duration-150 rounded-xl p-2 max-xl:p-1 bg-(--bg-secondary) animate-bottom-appear shrink-0 ${
             isOverLength
               ? "border-red-500"
               : "border-(--border-color) focus-within:border-(--border-color-active)"

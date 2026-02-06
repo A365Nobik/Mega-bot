@@ -50,7 +50,7 @@ const Message = memo(({ message }: IProps) => {
         </Paragraph>
       </div>
       <div className="flex items-end gap-2 group">
-        <Paragraph>{message.text}</Paragraph>
+        <Paragraph text={{size:"text-md"}}>{message.text}</Paragraph>
         <Button
           text={{ size: "text-sm" }}
           className="opacity-0 scale-0 duration-300 delay-75 -rotate-90"

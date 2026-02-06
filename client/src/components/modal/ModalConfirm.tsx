@@ -33,9 +33,11 @@ const ModalConfirm = memo((props: Props) => {
     <div
       className={`inset-0 z-100 fixed flex justify-center items-center bg-black/50 duration-300 transition-all ${opacity}`}
     >
-      <div className="delete-modal flex flex-col justify-around items-center w-[25%] h-[15%] max-xl:w-[45%] max-xl:h-[35%]  bg-(--bg-primary) rounded-xl p-4">
+      <div className="delete-modal flex flex-col justify-around items-center w-100 h-75 max-xl:w-80 max-xl:h-55 max-sm:w-65 bg-(--bg-primary) rounded-xl p-4">
         <div className="flex flex-col gap-2 items-center">
-          <Heading>{props.questions}</Heading>
+          <Heading text={{ className: "w-full" }}>
+            {props.questions}
+          </Heading>
           <Paragraph
             text={{ size: "text-md", color: "text-(--text-primary)/50" }}
           >

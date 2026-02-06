@@ -12,10 +12,10 @@ import { ModalConfirm } from "@/components/modal";
 import type { ChangeEvent } from "react";
 
 const SideBar = memo(() => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isChatsOpen, setChatsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isChatsOpen, setChatsOpen] = useState<boolean>(true);
+  const [iconsSize, setIconsSize] = useState<number>(32);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [hoveredChatKey, setHoveredChatKey] = useState<string | null>(null);
   const chatBlockRef = useRef<HTMLDivElement | null>(null);
   const openChats = () => setChatsOpen((prev) => !prev);
   const openSideBar = () => setIsOpen((prev) => !prev);
@@ -29,6 +29,18 @@ const SideBar = memo(() => {
       refreshHistory();
     }
   }, [refreshHistory]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleResize = () => {
+      setIconsSize(window.innerWidth < 768 ? 22 : 32);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const filteredHistory = useMemo(() => {
     if (!history || !searchQuery.trim()) {
@@ -75,12 +87,12 @@ const SideBar = memo(() => {
 
   return (
     <>
-      <aside className="h-screen fixed">
+      <aside className="h-screen fixed z-50">
         <motion.nav
           initial={{ width: 64 }}
           animate={{ width: isOpen ? 256 : 64 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          className={`h-full bg-(--bg-secondary) flex flex-col justify-center items-start p-2 ease-in-out animate-side-appear gap-6 overflow-hidden`}
+          className={`h-full bg-(--bg-secondary) flex flex-col justify-center items-start p-2 ease-in-out animate-side-appear gap-6 overflow-hidden ${!isOpen && "max-md:bg-transparent max-md:transition-colors max-md:duration-700"}`}
         >
           <div className="flex flex-col justify-center items-center gap-2 mb-auto w-full">
             <div className="flex items-center justify-between w-full">
@@ -99,7 +111,7 @@ const SideBar = memo(() => {
                 initial={{ x: -100 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 animate={{ x: isOpen ? -5 : -100 }}
-                className={` ${isOpen ? null : "max-xl:-translate-x-[15px]"}`}
+                className={`flex items-center ${isOpen ? "" : "max-xl:translate-x-[16px] max-lg:translate-x-[16px] max-md:bg-(--bg-secondary) max-md:p-2 max-md:rounded-full"}`}
               >
                 <Button
                   defaultActive={false}
@@ -107,7 +119,7 @@ const SideBar = memo(() => {
                   onClick={openSideBar}
                 >
                   <MainIconBlock>
-                    <Sidebar size={32} />
+                    <Sidebar size={iconsSize} />
                   </MainIconBlock>
                 </Button>
               </motion.span>
@@ -115,7 +127,7 @@ const SideBar = memo(() => {
             <Button
               hover="hover:bg-(--bg-primary)"
               defaultHover={false}
-              className="flex justify-center items-center w-full p-1 rounded-lg gap-2"
+              className={`flex justify-center items-center w-full p-1 rounded-lg gap-2 ${!isOpen && "max-md:hidden"}`}
             >
               <a href={"/"}>
                 <PlusCircle size={!isOpen ? 32 : 22} />
@@ -153,9 +165,9 @@ const SideBar = memo(() => {
                   <Paragraph>Чаты</Paragraph>
                   {history && history.length > 0 && (
                     <MainIconBlock
-                      className={`scale-0 transition-transform duration-250 ${
+                      className={`lg:scale-0  transition-transform duration-250 ${
                         !isChatsOpen ? "rotate-180" : ""
-                      } group-hover:scale-100`}
+                      } lg:group-hover:scale-100`}
                     >
                       <ArrowDown size={20} />
                     </MainIconBlock>
@@ -204,13 +216,10 @@ const SideBar = memo(() => {
                       ? params.id[0]
                       : params.id
                     )?.toString() === sessionId;
-                  const isHovered = hoveredChatKey === el;
 
                   return (
                     <motion.div
                       key={index}
-                      onMouseEnter={() => setHoveredChatKey(el)}
-                      onMouseLeave={() => setHoveredChatKey(null)}
                       className={`group relative flex items-center justify-between text-(--text-primary) w-full rounded-lg p-2 transition-all ${
                         isActive
                           ? "bg-(--bg-secondary) border border-(--border-color-active)"
@@ -227,35 +236,27 @@ const SideBar = memo(() => {
                             : `${chatName}`}
                         </Paragraph>
                       </Link>
-                      <AnimatePresence>
-                        {isHovered && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.8, x: 10 }}
-                            animate={{ opacity: 1, scale: 1, x: 0 }}
-                            exit={{ opacity: 0, scale: 0.8, x: 10 }}
-                            transition={{ duration: 0.15 }}
-                          >
-                            <Button
-                              title="Удалить чат"
-                              defaultHover={false}
-                              onClick={() => {
-                                deleteChat(el);
-                              }}
-                              className="bg-red-700 hover:bg-red-600 p-1 rounded-md"
-                            >
-                              <MainIconBlock>
-                                <Trash size={16} />
-                              </MainIconBlock>
-                            </Button>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+
+                      <div>
+                        <Button
+                          title="Удалить чат"
+                          defaultHover={false}
+                          onClick={() => {
+                            deleteChat(el);
+                          }}
+                          className="bg-red-700 hover:bg-red-600 p-1 rounded-md"
+                        >
+                          <MainIconBlock>
+                            <Trash size={16} />
+                          </MainIconBlock>
+                        </Button>
+                      </div>
                     </motion.div>
                   );
                 })}
               </div>
             ) : history && history.length > 0 ? (
-              <div className="bg-(--bg-primary) p-2 rounded-xl">
+              <div className="bg-(--bg-primary) p-2 rounded-xl w-full text-center">
                 <Paragraph>Чаты не найдены</Paragraph>
               </div>
             ) : (
