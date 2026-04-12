@@ -100,7 +100,8 @@ const streamMessageEvent = ({
           event.message ||
           `Перенаправление с ${event.from_model} на ${event.to_model}`,
         timestamp: new Date(),
-        model: event.to_model || undefined,
+          model: event.to_model || undefined,
+          response_type:"request_to_model"
       };
       setMessages((prev) => {
         const newMessages = [...prev, redirectMessage];

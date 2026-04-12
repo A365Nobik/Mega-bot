@@ -70,19 +70,22 @@ body {
   }
 }
 body {
-  --bg-primary: #222831;
-  --bg-secondary: #31363f;
-  --text-primary: #eeeeee;
-  --text-secondary: #dcd7c9;
-  --btn-primary: #ffd369;
+  --bg-primary: #1a1e26;          
+  --bg-secondary: #2a2f3a;        
+  
+  --text-primary: #ffffff;        
+  --text-secondary: #cbd5e1;       
+  --btn-primary: #ffce52;         
+  --btn-primary-text: #1a1e26;    
+  
+  --btn-secondary: #3b4252;      
+  --btn-secondary-text: #ffffff;
+  
+  --border-color: rgba(255, 255, 255, 0.1); 
+  --border-color-active: #3b82f6;         
+  
   --icon-hover-primary: var(--btn-primary);
-  --btn-secondary: #393e46;
-  --btn-primary-text: #393e46;
-  --btn-secondary-text: var(--text-primary);
-  --border-color: var(--text-primary);
-  --border-color-active: #4b70f5;
 }
-
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;

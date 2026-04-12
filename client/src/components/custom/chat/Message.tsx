@@ -32,8 +32,9 @@ const Message = memo(({ message }: IProps) => {
   };
 
   return (
-    <div
-      className={`bg-(--bg-secondary) p-4 max-xl:p-2 rounded-md max-w-[80%] ${
+      <div
+          //background color test
+      className={`${message.response_type=="request_to_model"?"bg-(--bg-secondary)":""} p-4 max-xl:p-2 rounded-md max-w-[80%] ${
         message.sender === "user" ? "self-end" : "self-start"
       }`}
     >
@@ -63,7 +64,7 @@ const Message = memo(({ message }: IProps) => {
           <Copy />
         </Button>
       </div>
-      <Paragraph text={{ size: "text-sm" }}>{sended}</Paragraph>
+      <Paragraph text={{ size: "text-sm", color:"text-(--text-primary)/50"}}>{sended}</Paragraph>
     </div>
   );
 });

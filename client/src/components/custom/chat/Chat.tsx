@@ -301,7 +301,7 @@ const Chat = () => {
     const value = event.target.value as Models;
     setStartingModel(value);
   };
-
+  console.log(messages);
   return (
     <div
       ref={chatRef}
@@ -327,7 +327,15 @@ const Chat = () => {
             const messageKey = msg.timestamp
               ? `msg-${idx}-${msg.timestamp.toLocaleString()}`
               : `msg-${idx}`;
-            return <Message key={messageKey} message={msg} />;
+            return (
+              <div key={idx}>
+                <Message key={messageKey} message={msg} />
+                {idx != messages.length - 1 &&
+                  msg.model != messages[idx + 1].model && (
+                    <hr className="text-(--text-primary)" />
+                  )}
+              </div>
+            );
           })}
           {isLoading && (
             <div className="bg-(--bg-secondary) p-4 rounded-lg max-w-[80%] self-start">
