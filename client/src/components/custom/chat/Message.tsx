@@ -32,9 +32,8 @@ const Message = memo(({ message }: IProps) => {
   };
 
   return (
-      <div
-          //background color test
-      className={`${message.response_type=="request_to_model"?"bg-(--bg-secondary)":""} p-4 max-xl:p-2 rounded-md max-w-[80%] ${
+    <div
+      className={`${message.response_type == "request_to_model" ? "bg-(--bg-secondary)" : ""} p-4 max-xl:p-2 rounded-md max-w-[80%] ${
         message.sender === "user" ? "self-end" : "self-start"
       }`}
     >
@@ -51,7 +50,7 @@ const Message = memo(({ message }: IProps) => {
         </Paragraph>
       </div>
       <div className="flex items-end gap-2 group">
-        <Paragraph text={{size:"text-md"}}>{message.text}</Paragraph>
+        <Paragraph text={{ size: "text-md" }}>{message.text}</Paragraph>
         <Button
           text={{ size: "text-sm" }}
           className="opacity-0 scale-0 duration-300 delay-75 -rotate-90"
@@ -61,10 +60,12 @@ const Message = memo(({ message }: IProps) => {
           active="active:scale-80"
           onClick={copyMessage}
         >
-          <Copy />
+          <Copy size={22} />
         </Button>
       </div>
-      <Paragraph text={{ size: "text-sm", color:"text-(--text-primary)/50"}}>{sended}</Paragraph>
+      <Paragraph text={{ size: "text-sm", color: "text-(--text-primary)/50" }}>
+        {sended}
+      </Paragraph>
     </div>
   );
 });

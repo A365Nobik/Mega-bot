@@ -19,7 +19,6 @@ class GigaChatModel(BaseAIModel):
         self._MessagesRole = None
         
     def _lazy_import_gigachat(self):
-        """Отложенный импорт для избежания конфликтов с Pydantic v2"""
         if self._gigachat_module is None:
             try:
                 from gigachat import GigaChat
@@ -107,10 +106,16 @@ class GigaChatModel(BaseAIModel):
         if extracted_json:
             return json.dumps(extracted_json, ensure_ascii=False)
 
+        try:
+            parsed = json.loads(response_text.strip())
+            return json.dumps(parsed, ensure_ascii=False)
+        except json.JSONDecodeError:
+            pass
+
         return json.dumps(
             {
                 "response_type": ResponseType.FINAL_ANSWER.value,
-                "body": f"GigaChat: {response_text}",
+                "body": response_text,
             },
             ensure_ascii=False,
         )

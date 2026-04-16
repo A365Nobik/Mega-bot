@@ -105,7 +105,9 @@ const SideBar = memo(() => {
                 <MainIconBlock>
                   <MainIcon h={24} w={24} />
                 </MainIconBlock>
-                <Heading text={{ size: "text-2xl" }}>Mega-Bot</Heading>
+                <Heading text={{ size: "text-2xl" }}>
+                  <Link href={"/"}>Mega-Bot</Link>
+                </Heading>
               </motion.span>
               <motion.span
                 initial={{ x: -100 }}
@@ -154,7 +156,7 @@ const SideBar = memo(() => {
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className={`w-full flex flex-col items-start overflow-auto flex-1 gap-2 rounded-md `}
           >
-            <div className="w-full group flex justify-between items-center ">
+            <div className="w-full group flex justify-between items-center">
               <div className="flex items-center w-full cursor-pointer">
                 <Button
                   defaultActive={false}
@@ -198,7 +200,7 @@ const SideBar = memo(() => {
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   setSearchQuery(event.target.value)
                 }
-                className="w-full p-2 max-xl:p-1 rounded-md bg-(--bg-primary)  text-(--text-primary) placeholder:text-(--text-secondary) outline-none border focus:border-(--border-color-active) transition-colors"
+                className="w-full p-2 max-xl:p-1 rounded-md bg-(--bg-primary)  text-(--text-primary) placeholder:text-(--text-secondary) outline-none border border-(--border-color) focus:border-(--border-color-active) transition-colors"
               />
             )}
             {filteredHistory && filteredHistory.length > 0 ? (
@@ -206,7 +208,7 @@ const SideBar = memo(() => {
                 ref={chatBlockRef}
                 className={`bg-(--bg-primary) p-2 rounded-xl flex flex-col gap-1 w-full transition-opacity duration-250 ease-in-out`}
               >
-                {filteredHistory.map((el, index) => {
+                {[...filteredHistory].reverse().map((el, index) => {
                   const parts = el.split(",");
                   const sessionId = parts[0];
                   const chatName =

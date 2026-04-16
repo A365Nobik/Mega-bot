@@ -328,7 +328,7 @@ const Chat = () => {
               ? `msg-${idx}-${msg.timestamp.toLocaleString()}`
               : `msg-${idx}`;
             return (
-              <div key={idx}>
+              <div key={idx} className="flex flex-col w-full">
                 <Message key={messageKey} message={msg} />
                 {idx != messages.length - 1 &&
                   msg.model != messages[idx + 1].model && (
@@ -338,7 +338,7 @@ const Chat = () => {
             );
           })}
           {isLoading && (
-            <div className="bg-(--bg-secondary) p-4 rounded-lg max-w-[80%] self-start">
+            <div className="bg-gray-400/5 p-4 rounded-lg max-w-[80%] self-start">
               <div className="flex items-center gap-2">
                 <MainIconBlock defaultActive={false}>
                   <MainIcon w={20} h={20}></MainIcon>
